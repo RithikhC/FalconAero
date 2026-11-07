@@ -35,3 +35,66 @@ samples (hourly :00 with verifying obs): OMDB=95770 (fog at t 157), OMAA=95745 (
   [onset120] val(OMDB 2021-2022) OMDB   withHinge λ=0.0001: AUC=0.9953 AP=0.367 logloss=0.00693 (iters 906)
   [onset120] val(OMDB 2021-2022) OMDB   withHinge λ=0.001: AUC=0.9935 AP=0.267 logloss=0.00826 (iters 198)
   [onset120] val(OMDB 2021-2022) pooled base      λ=0.00001: AUC=0.9954 AP=0.394 logloss=0.00658 (iters 2001)
+  [onset120] val(OMDB 2021-2022) pooled base      λ=0.0001: AUC=0.9949 AP=0.362 logloss=0.00698 (iters 1063)
+  [onset120] val(OMDB 2021-2022) pooled base      λ=0.001: AUC=0.9919 AP=0.253 logloss=0.00818 (iters 314)
+  [onset120] val(OMDB 2021-2022) pooled withHinge λ=0.00001: AUC=0.9954 AP=0.395 logloss=0.00656 (iters 2001)
+  [onset120] val(OMDB 2021-2022) pooled withHinge λ=0.0001: AUC=0.9946 AP=0.366 logloss=0.00715 (iters 1178)
+  [onset120] val(OMDB 2021-2022) pooled withHinge λ=0.001: AUC=0.9934 AP=0.299 logloss=0.00832 (iters 338)
+  [onset120] CHOSEN pool=OMDB set=withHinge λ=0.00001; train n=69116 (pos 116), iters=2497, OMDB train AUC=0.9926
+  [onset120] TEST OMDB: n=26221 pos=11 base=0.00042 AUC=0.9987 [0.997,1.000] AP=0.346 [0.103,0.617] Brier=0.00036 BSS(clim)=0.186 | thr=0.15 TP=6 FP=16 FN=5 P=0.273 R=0.545 F1=0.364 CSI=0.222
+  [onset120] TEST OMDB baselines: clim AUC=0.7950 AP=0.006 Brier=0.00044; T−Td rule AUC=0.9947 AP=0.112; const Brier=0.00042; persistence Brier=0.00042 F1=0.000
+  [onset120] TEST OMDB humid subset (RH≥80%): n=603 pos=11 AUC=0.9449 AP=0.346 T−Td rule AUC=0.7671
+  calibration: 0.0–0.1: p=0.0007 obs=0.0001 n=26180 | 0.1–0.2: p=0.1325 obs=0.125 n=24 | 0.2–0.3: p=0.2394 obs=0.125 n=8 | 0.3–0.4: p=0.3757 obs=1 n=1 | 0.4–0.5: p=0.454 obs=0.6667 n=3 | 0.5–0.6: p=0.54 obs=0 n=3 | 0.6–0.7: p=0.6978 obs=0 n=1 | 0.7–0.8: p=0.7507 obs=1 n=1 | 0.8–0.9: p=0.85 obs=null n=0 | 0.9–1.0: p=0.95 obs=null n=0
+  [onset120] TEST 3-station: n=78482 pos=119 base=0.00152 AUC=0.9773 [0.941,0.995] AP=0.238 [0.163,0.335] Brier=0.00153 BSS(clim)=-0.008 | thr=0.15 TP=76 FP=414 FN=43 P=0.155 R=0.639 F1=0.250 CSI=0.143
+  [onset120] TEST 3-station baselines: clim AUC=0.6853 AP=0.004 Brier=0.00152; T−Td rule AUC=0.9705 AP=0.102; const Brier=0.00151; persistence Brier=0.00152 F1=0.000
+  [onset120] TEST 3-station humid subset (RH≥80%): n=4916 pos=114 AUC=0.9167 AP=0.247 T−Td rule AUC=0.8274
+  calibration: 0.0–0.1: p=0.0015 obs=0.0003 n=77696 | 0.1–0.2: p=0.1392 obs=0.059 n=441 | 0.2–0.3: p=0.2425 obs=0.1119 n=143 | 0.3–0.4: p=0.3397 obs=0.2195 n=82 | 0.4–0.5: p=0.449 obs=0.2449 n=49 | 0.5–0.6: p=0.5411 obs=0.2 n=30 | 0.6–0.7: p=0.6417 obs=0.2778 n=18 | 0.7–0.8: p=0.7378 obs=0.5 n=10 | 0.8–0.9: p=0.8523 obs=0.4444 n=9 | 0.9–1.0: p=0.9237 obs=0.5 n=4
+
+=== PERSISTENCE model, 60 min (fog at t) ===
+  [persist60] val(OMDB 2021-2022) OMDB   base      λ=0.00001: AUC=0.8289 AP=0.942 logloss=0.37479 (iters 1821)
+  [persist60] val(OMDB 2021-2022) OMDB   base      λ=0.0001: AUC=0.8395 AP=0.946 logloss=0.36377 (iters 1352)
+  [persist60] val(OMDB 2021-2022) OMDB   base      λ=0.001: AUC=0.8605 AP=0.954 logloss=0.35149 (iters 537)
+  [persist60] val(OMDB 2021-2022) OMDB   withHinge λ=0.00001: AUC=0.8289 AP=0.942 logloss=0.37529 (iters 1666)
+  [persist60] val(OMDB 2021-2022) OMDB   withHinge λ=0.0001: AUC=0.8395 AP=0.946 logloss=0.36533 (iters 1358)
+  [persist60] val(OMDB 2021-2022) OMDB   withHinge λ=0.001: AUC=0.8605 AP=0.954 logloss=0.35166 (iters 456)
+  [persist60] val(OMDB 2021-2022) pooled base      λ=0.00001: AUC=0.9237 AP=0.981 logloss=0.31274 (iters 1531)
+  [persist60] val(OMDB 2021-2022) pooled base      λ=0.0001: AUC=0.9237 AP=0.981 logloss=0.31244 (iters 1167)
+  [persist60] val(OMDB 2021-2022) pooled base      λ=0.001: AUC=0.9316 AP=0.983 logloss=0.31009 (iters 416)
+  [persist60] val(OMDB 2021-2022) pooled withHinge λ=0.00001: AUC=0.9237 AP=0.981 logloss=0.31274 (iters 1387)
+  [persist60] val(OMDB 2021-2022) pooled withHinge λ=0.0001: AUC=0.9237 AP=0.981 logloss=0.31242 (iters 1113)
+  [persist60] val(OMDB 2021-2022) pooled withHinge λ=0.001: AUC=0.9316 AP=0.983 logloss=0.31006 (iters 433)
+  [persist60] CHOSEN pool=pooled set=withHinge λ=0.001; train n=1137 (pos 859), iters=401, OMDB train AUC=0.8576
+  [persist60] TEST OMDB: n=5 pos=3 base=0.60000 AUC=0.6667 [0.000,1.000] AP=0.806 [0.250,1.000] Brier=0.27513 BSS(clim)=0.028 | thr=0.43 TP=1 FP=1 FN=2 P=0.500 R=0.333 F1=0.400 CSI=0.250
+  [persist60] TEST OMDB baselines: clim AUC=0.5000 AP=0.639 Brier=0.28305; T−Td rule AUC=0.6667 AP=0.694; const Brier=0.26250; persistence Brier=0.40000 F1=0.750
+  [persist60] TEST OMDB humid subset (RH≥80%): n=5 pos=3 AUC=0.6667 AP=0.806 T−Td rule AUC=0.6667
+  calibration: 0.0–0.1: p=0.05 obs=null n=0 | 0.1–0.2: p=0.1795 obs=0 n=1 | 0.2–0.3: p=0.2779 obs=1 n=1 | 0.3–0.4: p=0.35 obs=null n=0 | 0.4–0.5: p=0.4296 obs=1 n=1 | 0.5–0.6: p=0.55 obs=null n=0 | 0.6–0.7: p=0.699 obs=0 n=1 | 0.7–0.8: p=0.75 obs=null n=0 | 0.8–0.9: p=0.85 obs=null n=0 | 0.9–1.0: p=0.9108 obs=1 n=1
+  [persist60] TEST 3-station: n=130 pos=81 base=0.62308 AUC=0.7841 [0.700,0.871] AP=0.856 [0.760,0.925] Brier=0.17725 BSS(clim)=0.328 | thr=0.43 TP=75 FP=26 FN=6 P=0.743 R=0.926 F1=0.824 CSI=0.701
+  [persist60] TEST 3-station baselines: clim AUC=0.5620 AP=0.658 Brier=0.26393; T−Td rule AUC=0.5343 AP=0.643; const Brier=0.25096; persistence Brier=0.37692 F1=0.768
+  [persist60] TEST 3-station humid subset (RH≥80%): n=129 pos=81 AUC=0.7796 AP=0.856 T−Td rule AUC=0.5246
+  calibration: 0.0–0.1: p=0.0651 obs=0 n=3 | 0.1–0.2: p=0.1676 obs=0.1111 n=9 | 0.2–0.3: p=0.2531 obs=0.4286 n=7 | 0.3–0.4: p=0.3308 obs=0.1429 n=7 | 0.4–0.5: p=0.4565 obs=0.6364 n=11 | 0.5–0.6: p=0.5558 obs=0.5 n=10 | 0.6–0.7: p=0.6522 obs=0.6471 n=17 | 0.7–0.8: p=0.7636 obs=0.7333 n=15 | 0.8–0.9: p=0.8494 obs=0.7308 n=26 | 0.9–1.0: p=0.9447 obs=0.92 n=25
+
+[OMDB] climatology (hourly obs n=96088):
+  % fog by month: 0.41 0.32 0.18 0.16 0.00 0.05 0.00 0.00 0.09 0.09 0.01 0.65
+  fog days/month: 0.64 1 0.64 0.82 0 0.27 0 0 0.64 0.36 0.09 1.09 (years: 11,11,11,11,11,11,11,11,11,11,11,11); total/yr 5.5
+  fog days by year: {"2015":8,"2016":10,"2017":7,"2018":3,"2019":4,"2020":6,"2021":12,"2022":6,"2023":2,"2024":1,"2025":2}
+  % fog by local hour: 0.02 0.02 0.13 0.15 0.15 0.52 0.70 1.00 0.77 0.35 0.10 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  events per season (Jul–Jun): {"2014/15":5,"2015/16":5,"2016/17":10,"2017/18":8,"2018/19":3,"2019/20":4,"2020/21":15,"2021/22":4,"2022/23":3,"2023/24":2,"2024/25":1,"2025/26":1}; total 61, mean duration 2.1298 h
+
+[OMAA] climatology (hourly obs n=96072):
+  % fog by month: 1.40 1.19 0.49 0.23 0.01 0.01 0.01 0.04 0.35 0.42 0.05 1.14
+  fog days/month: 2.36 2.45 1.55 1 0.09 0.45 0.09 0.36 1.64 1.36 0.27 1.73 (years: 11,11,11,11,11,11,11,11,11,11,11,11); total/yr 13.3
+  fog days by year: {"2015":22,"2016":19,"2017":23,"2018":15,"2019":6,"2020":12,"2021":24,"2022":13,"2023":2,"2024":7,"2025":4}
+  % fog by local hour: 0.03 0.10 0.40 0.47 0.83 1.23 1.75 2.12 2.00 1.12 0.42 0.08 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.02 0.03 0.03
+  events per season (Jul–Jun): {"2014/15":11,"2015/16":20,"2016/17":20,"2017/18":26,"2018/19":6,"2019/20":8,"2020/21":26,"2021/22":12,"2022/23":6,"2023/24":4,"2024/25":6,"2025/26":2}; total 147, mean duration 2.689 h
+
+[OMDW] climatology (hourly obs n=95927):
+  % fog by month: 1.24 1.57 0.81 1.09 0.59 0.45 0.12 0.11 0.53 0.53 0.23 1.39
+  fog days/month: 1.82 2.36 1.82 2.09 1.27 1.55 0.45 0.55 1.82 2 0.82 1.91 (years: 11,11,11,11,11,11,11,11,11,11,11,11); total/yr 18.5
+  fog days by year: {"2015":21,"2016":22,"2017":34,"2018":16,"2019":10,"2020":16,"2021":28,"2022":15,"2023":13,"2024":17,"2025":11}
+  % fog by local hour: 0.25 0.53 0.75 1.45 1.96 2.55 2.98 3.13 1.98 0.95 0.40 0.03 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.03 0.03 0.07 0.15
+  events per season (Jul–Jun): {"2014/15":16,"2015/16":13,"2016/17":32,"2017/18":26,"2018/19":14,"2019/20":14,"2020/21":28,"2021/22":9,"2022/23":18,"2023/24":15,"2024/25":14,"2025/26":5}; total 204, mean duration 2.5586 h
+
+examples: [["hit","2024-02-24","06:00",0.6513,"Fog at 06:33 local, vis 700 m, RVR 12L >2000 m"],["hit","2025-11-20","07:00",0.4502,"Fog at 07:08 local, vis 700 m, RVR 30L 600 m"],["hit","2023-02-22","07:00",0.3973,"Fog at 07:07 local, vis 800 m, RVR 30L >2000 m"],["miss","2025-03-18","07:00",0.0997,"Fog at 07:36 local, vis 500 m, RVR 30L 650 m"],["false alarm","2024-04-01","07:00",0.551,"No fog within 60 min"]]
+
+self-check predict() vs pipeline on OMDB test rows: max |Δp| = 3.03e-6 (non-zero only from 6-significant-digit rounding)
+wrote D:\R I T H I K H\FalconAero\js\fogmodel.js (20.6 KB) in 990.8 s

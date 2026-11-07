@@ -119,9 +119,9 @@ the training mean, which is 0 after standardisation.
 |---|---|---|
 | Samples / onset events | 26,245 / 6 | 78,558 / 61 |
 | Base rate | 0.023 % | 0.078 % |
-| **AUC-ROC** | **0.9998** [[OMDB60_AUCCI]] | 0.981 [[NET60_AUCCI]] |
-| **PR-AUC (average precision)** | **0.534** [[OMDB60_APCI]] | 0.182 [[NET60_APCI]] |
-| Brier score | [[OMDB60_BRIER]] | [[NET60_BRIER]] |
+| **AUC-ROC** | **0.9998** (95% CI 0.9996–1) | 0.981 (95% CI 0.946–0.998) |
+| **PR-AUC (average precision)** | **0.534** (95% CI 0.185–0.877) | 0.182 (95% CI 0.120–0.290) |
+| Brier score | 0.0001583 (climatology 0.0002362) | 0.0007855 (climatology 0.00078) |
 | Brier skill vs climatology | **+0.33** | −0.01 (over-confident at OMAA/OMDW) |
 | Threshold | 0.10 | 0.10 |
 | Hits / false alarms / misses | 5 / 11 / 1 | 39 / 265 / 22 |
@@ -168,8 +168,8 @@ predicted 0.2–0.5, the observed rate is 0.15–0.19. Those stations need their
 | Metric | OMDB test |
 |---|---|
 | Events | 11 of 26,221 |
-| AUC | 0.9987 [[OMDB120_AUCCI]] |
-| PR-AUC | 0.346 [[OMDB120_APCI]] |
+| AUC | 0.9987 (95% CI 0.9973–0.9996) |
+| PR-AUC | 0.346 (95% CI 0.103–0.617) |
 | Brier skill vs climatology | +0.19 |
 | Threshold | 0.15 |
 | Precision / Recall / F1 | 0.27 / 0.55 / 0.36 |
@@ -181,8 +181,8 @@ This model is evaluated on the 3-station test set (130 cases, 62 % persist). OMD
 
 | Measure | Model | Persistence ("fog continues", p = 1) |
 |---|---|---|
-| AUC | 0.784 [[PER_AUCCI]] | — |
-| Brier | [[PER_BRIER]] | [[PER_PBRIER]] |
+| AUC | 0.784 (95% CI 0.700–0.871) | — |
+| Brier | 0.1772 | 0.3769 |
 | F1 (model threshold 0.43) | 0.82 | 0.77 |
 
 The fog-dissipation signal is mostly carried by time of day (sunrise heating), current visibility and station.
