@@ -8,3 +8,30 @@ samples (hourly :00 with verifying obs): OMDB=95770 (fog at t 157), OMAA=95745 (
   [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.00001: AUC=0.9960 AP=0.331 logloss=0.00372 (iters 1722)
   [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.0001: AUC=0.9960 AP=0.286 logloss=0.00409 (iters 645)
   [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.001: AUC=0.9938 AP=0.190 logloss=0.00489 (iters 173)
+  [onset60] val(OMDB 2021-2022) OMDB   withHinge λ=0.00001: AUC=0.9963 AP=0.334 logloss=0.00368 (iters 2001)
+  [onset60] val(OMDB 2021-2022) OMDB   withHinge λ=0.0001: AUC=0.9956 AP=0.272 logloss=0.00416 (iters 666)
+  [onset60] val(OMDB 2021-2022) OMDB   withHinge λ=0.001: AUC=0.9941 AP=0.206 logloss=0.00487 (iters 179)
+  [onset60] val(OMDB 2021-2022) pooled base      λ=0.00001: AUC=0.9970 AP=0.342 logloss=0.00376 (iters 1853)
+  [onset60] val(OMDB 2021-2022) pooled base      λ=0.0001: AUC=0.9962 AP=0.276 logloss=0.00403 (iters 830)
+  [onset60] val(OMDB 2021-2022) pooled base      λ=0.001: AUC=0.9943 AP=0.178 logloss=0.00468 (iters 201)
+  [onset60] val(OMDB 2021-2022) pooled withHinge λ=0.00001: AUC=0.9970 AP=0.339 logloss=0.00374 (iters 2001)
+  [onset60] val(OMDB 2021-2022) pooled withHinge λ=0.0001: AUC=0.9962 AP=0.282 logloss=0.00415 (iters 920)
+  [onset60] val(OMDB 2021-2022) pooled withHinge λ=0.001: AUC=0.9948 AP=0.198 logloss=0.00482 (iters 241)
+  [onset60] CHOSEN pool=OMDB set=withHinge λ=0.00001; train n=69368 (pos 60), iters=2251, OMDB train AUC=0.9954
+  [onset60] TEST OMDB: n=26245 pos=6 base=0.00023 AUC=0.9998 [1.000,1.000] AP=0.534 [0.185,0.877] Brier=0.00016 BSS(clim)=0.330 | thr=0.1 TP=5 FP=11 FN=1 P=0.313 R=0.833 F1=0.455 CSI=0.294
+  [onset60] TEST OMDB baselines: clim AUC=0.6973 AP=0.002 Brier=0.00024; T−Td rule AUC=0.9964 AP=0.163; const Brier=0.00023; persistence Brier=0.00023 F1=0.000
+  [onset60] TEST OMDB humid subset (RH≥80%): n=605 pos=6 AUC=0.9922 AP=0.534 T−Td rule AUC=0.8436
+  calibration: 0.0–0.1: p=0.0004 obs=0 n=26229 | 0.1–0.2: p=0.1473 obs=0 n=6 | 0.2–0.3: p=0.2581 obs=0.6667 n=3 | 0.3–0.4: p=0.3973 obs=1 n=1 | 0.4–0.5: p=0.4329 obs=0.3333 n=3 | 0.5–0.6: p=0.5455 obs=0 n=2 | 0.6–0.7: p=0.6513 obs=1 n=1 | 0.7–0.8: p=0.75 obs=null n=0 | 0.8–0.9: p=0.85 obs=null n=0 | 0.9–1.0: p=0.95 obs=null n=0
+  [onset60] TEST 3-station: n=78558 pos=61 base=0.00078 AUC=0.9809 [0.946,0.997] AP=0.182 [0.120,0.290] Brier=0.00079 BSS(clim)=-0.007 | thr=0.1 TP=39 FP=265 FN=22 P=0.128 R=0.639 F1=0.214 CSI=0.120
+  [onset60] TEST 3-station baselines: clim AUC=0.6736 AP=0.002 Brier=0.00078; T−Td rule AUC=0.9766 AP=0.070; const Brier=0.00078; persistence Brier=0.00078 F1=0.000
+  [onset60] TEST 3-station humid subset (RH≥80%): n=4922 pos=58 AUC=0.9475 AP=0.188 T−Td rule AUC=0.8744
+  calibration: 0.0–0.1: p=0.001 obs=0.0003 n=78254 | 0.1–0.2: p=0.1377 obs=0.0723 n=166 | 0.2–0.3: p=0.2425 obs=0.1833 n=60 | 0.3–0.4: p=0.3448 obs=0.1515 n=33 | 0.4–0.5: p=0.446 obs=0.1905 n=21 | 0.5–0.6: p=0.5387 obs=0.1667 n=6 | 0.6–0.7: p=0.6355 obs=0.2222 n=9 | 0.7–0.8: p=0.7633 obs=0.5 n=8 | 0.8–0.9: p=0.85 obs=null n=0 | 0.9–1.0: p=0.9026 obs=0 n=1
+
+=== ONSET model, 120 min (no fog at t) ===
+  [onset120] val(OMDB 2021-2022) OMDB   base      λ=0.00001: AUC=0.9952 AP=0.446 logloss=0.00630 (iters 1965)
+  [onset120] val(OMDB 2021-2022) OMDB   base      λ=0.0001: AUC=0.9955 AP=0.369 logloss=0.00692 (iters 877)
+  [onset120] val(OMDB 2021-2022) OMDB   base      λ=0.001: AUC=0.9918 AP=0.235 logloss=0.00855 (iters 195)
+  [onset120] val(OMDB 2021-2022) OMDB   withHinge λ=0.00001: AUC=0.9955 AP=0.447 logloss=0.00626 (iters 2001)
+  [onset120] val(OMDB 2021-2022) OMDB   withHinge λ=0.0001: AUC=0.9953 AP=0.367 logloss=0.00693 (iters 906)
+  [onset120] val(OMDB 2021-2022) OMDB   withHinge λ=0.001: AUC=0.9935 AP=0.267 logloss=0.00826 (iters 198)
+  [onset120] val(OMDB 2021-2022) pooled base      λ=0.00001: AUC=0.9954 AP=0.394 logloss=0.00658 (iters 2001)

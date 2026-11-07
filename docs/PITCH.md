@@ -27,7 +27,7 @@ Backup: a local copy (open `index.html`) works fully offline.
 The traffic is synthetic but calibrated to official GCAA volumes (Dubai 2023 is 450,691 movements). The fog model is trained on real METARs (2015–2025), with real GCAA datasets from Bayanat and live METAR/ADS-B. We don't have stand-level airport data; requesting it is step one of the pilot (see the Data & Evidence → Data gaps table).
 
 **How accurate is the fog model?**
-On a time-based test (2023–2025, never seen in training) the AUC is 0.98. But fog is rare (9 test events), so precision is modest. That's why it's an *alert* for humans, not an automatic action. Production would add NCM observations, RVR sensors and NWP ensembles. The model card is in the app.
+On a time-based test (2023–2025, never seen in training) ROC-AUC is 0.999 and it caught 5 of 6 fog onsets an hour ahead. But fog is rare (only 6 test events) and roughly 2 of 3 alerts are false alarms, so precision is modest. That's why it's an *alert* for humans, not an automatic action. Production would add NCM observations, RVR sensors and NWP ensembles. The model card is in the app.
 
 **What stops the AI from doing something unsafe?**
 Hard constraints (ICAO separation, stand code letters, fuel guardrails), a human must approve every plan, the AI never issues clearances, and everything is audited. The sandbox automatically blocks ideas that erode fuel margins.

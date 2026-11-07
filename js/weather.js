@@ -59,7 +59,7 @@
     }
   };
   const model = () => FA.fogModel || FALLBACK;
-  const ALERT = 0.35; // above the model's F1-optimal operating point (0.15) to keep false alarms low
+  const ALERT = 0.3; // above the model's F1-optimal operating point (0.10) to keep false alarms low
 
   function nowcast(inst, t) {
     const raw = featuresAt(inst, t);

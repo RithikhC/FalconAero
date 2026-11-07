@@ -17,7 +17,7 @@
     },
     {
       ms: 9000, view: 'ops', spot: '#wxPanel',
-      run() { const s0 = FA.state.inst.scenario.wx.start; let t = s0 - 60; while (t < s0 && FA.weather.nowcast(FA.state.inst, t).p < 0.35) t += 2; this.t = t; FA.app.setTime(t); FA.app.play(false); },
+      run() { const s0 = FA.state.inst.scenario.wx.start; let t = s0 - 60; while (t < s0 && FA.weather.nowcast(FA.state.inst, t).p < 0.3) t += 2; this.t = t; FA.app.setTime(t); FA.app.play(false); },
       text() { const s0 = FA.state.inst.scenario.wx.start, nc = FA.weather.nowcast(FA.state.inst, this.t); return '<b>Predict before it happens.</b> Our fog nowcast, ' + (FA.fogModel ? 'trained on <b>11 years</b> of real Dubai airport (OMDB) weather reports' : 'a logistic model on surface observations') + ', flags <b>' + Math.round(nc.p * 100) + '% fog risk ' + Math.round(s0 - this.t) + ' minutes before</b> visibility collapses, and shows <i>why</i>: shrinking dew-point gap, mist, calm wind, pre-dawn cooling.'; }
     },
     {
