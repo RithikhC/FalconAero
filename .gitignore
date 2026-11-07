@@ -1,0 +1,6 @@
+node_modules/
+data/live/
+.claude/
+*.log
+.DS_Store
+Thumbs.db

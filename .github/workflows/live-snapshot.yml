@@ -1,0 +1,39 @@
+# Live data pipeline for the static demo (no backend):
+# every 30 min, snapshot live METAR (NOAA Aviation Weather Center) and ADS-B (OpenSky Network)
+# for UAE airports and force-push them to the orphan branch `live-data`.
+# Those APIs block direct browser (CORS) access; raw.githubusercontent.com does not,
+# so the GitHub Pages app reads https://raw.githubusercontent.com/<repo>/live-data/*.json
+name: live-snapshot
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: live-snapshot
+  cancel-in-progress: true
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch METAR + ADS-B and publish to live-data branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          mkdir -p out && cd out
+          if curl -sf --max-time 30 'https://aviationweather.gov/api/data/metar?ids=OMDB,OMDW,OMAA,OMSJ,OMRK,OMFJ,OMAL&format=json' -o m.json && [ -s m.json ]; then
+            printf '{"fetchedAt":"%s","source":"aviationweather.gov","data":%s}\n' "$NOW" "$(cat m.json)" > metar.json
+          fi
+          if curl -sf --max-time 30 'https://opensky-network.org/api/states/all?lamin=22.5&lomin=51.5&lamax=26.5&lomax=56.6' -o a.json && [ -s a.json ]; then
+            printf '{"fetchedAt":"%s","source":"OpenSky Network","data":%s}\n' "$NOW" "$(cat a.json)" > adsb.json
+          fi
+          rm -f m.json a.json
+          ls -la
+          git init -q && git checkout -q -b live-data
+          git config user.name 'falconaero-bot' && git config user.email 'actions@users.noreply.github.com'
+          git add -A && git commit -qm "live snapshot $NOW"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${REPO}.git" live-data

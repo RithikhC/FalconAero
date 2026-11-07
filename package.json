@@ -1,0 +1,15 @@
+{
+  "name": "falconaero",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FalconAero — explainable, human-in-the-loop AI disruption recovery for UAE airports (UAE Hackathon 2026, GCAA challenge)",
+  "scripts": {
+    "start": "node tools/serve.js",
+    "build:opendata": "node tools/build_opendata.cjs",
+    "train:fog": "node tools/train_fog_model.mjs"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,10 @@
+[OMDB] {"reports":109786,"years":[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"hourly":96090,"visFromMetar":109666,"visFromVsby":116,"visMissing":4,"lowVis":331,"dust":45,"precip":10,"fog":276,"rvrReports":539}
+[OMAA] {"reports":100422,"years":[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"hourly":96073,"visFromMetar":100345,"visFromVsby":75,"visMissing":2,"lowVis":856,"dust":30,"precip":3,"fog":823,"rvrReports":1585}
+[OMDW] {"reports":106524,"years":[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"hourly":95928,"visFromMetar":106457,"visFromVsby":66,"visMissing":1,"lowVis":854,"dust":107,"precip":5,"fog":742,"rvrReports":1359}
+
+samples (hourly :00 with verifying obs): OMDB=95770 (fog at t 157), OMAA=95745 (fog at t 425), OMDW=95555 (fog at t 685)
+
+=== ONSET model, 60 min (no fog at t) ===
+  [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.00001: AUC=0.9960 AP=0.331 logloss=0.00372 (iters 1722)
+  [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.0001: AUC=0.9960 AP=0.286 logloss=0.00409 (iters 645)
+  [onset60] val(OMDB 2021-2022) OMDB   base      λ=0.001: AUC=0.9938 AP=0.190 logloss=0.00489 (iters 173)
