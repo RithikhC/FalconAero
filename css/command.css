@@ -274,3 +274,6 @@ body.cmd-mode .demo-bar { bottom: 20px; width: min(900px, 60vw); }
 .ev-legend b { display: inline-block; width: 10px; height: 4px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 @media (max-height: 900px) { .cmd-eval { display: none; } .cmd-left { grid-template-rows: auto auto minmax(0, 1fr); } }
 @media (max-width: 1400px) { .cmd-hint { display: none; } }
+.topbar.hq .cmd-status { flex-wrap: nowrap; overflow: hidden; min-width: 0; }
+.topbar.hq .cmd-pill { padding: 5px 11px; font-size: 11px; }
+@media (max-width: 1700px) { .topbar.hq .brand-sub { display: none !important; } }

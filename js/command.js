@@ -171,7 +171,7 @@
     if (!el) return;
     if (!L || !L.metar) { el.innerHTML = '<i></i>SIMULATION'; return; }
     const n = L.adsb ? L.adsb.length : null;
-    el.innerHTML = '<i></i>LIVE · ' + (L.kind === 'metar' ? 'METAR' : 'WX') + (n != null ? ' · ' + n + ' ✈ UAE' : '');
+    el.innerHTML = '<i></i>LIVE · ' + (L.kind === 'metar' ? 'METAR' : 'WEATHER') + (n != null ? ' · ' + n + ' ✈ UAE' : '');
     el.title = (L.source || '') + (L.cached ? ' (cached)' : '');
   }
 
