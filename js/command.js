@@ -157,7 +157,51 @@
     const cat = c.lvp ? ['CAT III', '#ef5350'] : o.visM < 5000 ? ['CAT I', '#ffd54f'] : ['VMC', '#66bb6a'];
     $('#cmdFog').innerHTML = '<div class="cmd-h"><span>AI FOG RADAR</span><span class="chip" style="color:' + cat[1] + ';border-color:' + cat[1] + '88">' + cat[0] + '</span></div>' +
       '<div class="cmd-fog-row">' + C.gauge(nc.p, 'next 60′') + '<div style="flex:1;min-width:0"><div class="cmd-fog-big">' + (c.rvr ? c.rvr + ' m' : o.visM >= 9999 ? '10 km+' : o.visM + ' m') + '</div><div class="cmd-fog-sub">' + (c.rvr ? 'RVR' : 'VISIBILITY') + ' · ' + o.tempC.toFixed(0) + '/' + o.dewC.toFixed(0) + '°C · ' + (o.windKt < 3 ? 'CALM' : o.windKt + ' KT') + '</div>' +
-      C.line([{ color: '#26c6da', points: pts, area: true }], { w: 220, h: 64, L: 4, yMax: 100, xMin: t, xMax: t + 180, xTicks: 2, xFmt: D.fmt, yFmt: () => '', noLegend: true, hlines: [{ y: 30, color: '#ffb300' }] }) + '</div></div>';
+      C.line([{ color: '#26c6da', points: pts, area: true }], { w: 220, h: 64, L: 4, yMax: 100, xMin: t, xMax: t + 180, xTicks: 2, xFmt: D.fmt, yFmt: () => '', noLegend: true, hlines: [{ y: 30, color: '#ffb300' }] }) + '</div></div>' + liveLine();
+  }
+
+  function liveLine() {
+    const L = FA.live && FA.live.metar && FA.live.metar.OMDB;
+    if (!L) return '';
+    const vis = L.visM == null ? '—' : L.visM >= 9999 ? '10km+' : Math.round(L.visM) + 'm';
+    return '<div class="cmd-liveline"><i></i>LIVE OMDB · ' + (L.tempC != null ? Math.round(L.tempC) + '/' + Math.round(L.dewC) + '°C · ' : '') + 'vis ' + vis + (L.fogP != null ? ' · fog ' + Math.round(L.fogP * 100) + '%' : '') + '</div>';
+  }
+  function renderHqLive() {
+    const L = FA.live, el = $('#hqLive');
+    if (!el) return;
+    if (!L || !L.metar) { el.innerHTML = '<i></i>SIMULATION'; return; }
+    const n = L.adsb ? L.adsb.length : null;
+    el.innerHTML = '<i></i>LIVE · ' + (L.kind === 'metar' ? 'METAR' : 'WX') + (n != null ? ' · ' + n + ' ✈ UAE' : '');
+    el.title = (L.source || '') + (L.cached ? ' (cached)' : '');
+  }
+
+  /* ---------- arrival sequence (runway assignment · stand · predicted delay) ---------- */
+  function renderSeq(t) {
+    const S = FA.state, plan = shownPlan(), ac = new Map((FA.map.lastAircraft || []).map((a) => [a.id, a]));
+    const rows = plan.seq.filter((s) => s.land >= t - 1.5).sort((a, b) => a.land - b.land).slice(0, 14);
+    const divs = plan.divs.filter((d) => Math.abs(d.f.eta - t) < 25);
+    const col = (f) => (f.airline === 'EK' ? '#e2b04a' : f.airline === 'FZ' ? '#4fc3f7' : '#90a4ae');
+    let h = '<div class="sq hd"><span>#</span><span>FLIGHT</span><span>ETA</span><span>LAND</span><span>RW</span><span>STAND</span><span>STATUS</span></div>';
+    divs.forEach((d) => { h += '<div class="sq" data-id="' + d.id + '"><span>—</span><span class="fl"><i style="background:' + col(d.f) + '"></i>' + d.id + '</span><span>' + D.fmt(d.f.eta) + '</span><span class="d2">—</span><span>—</span><span>—</span><span class="st div">↗ ' + d.alt + '</span></div>'; });
+    rows.forEach((s) => {
+      const a = plan.allocById.get(s.id), x = ac.get(s.id);
+      const dl = Math.round(s.land - s.f.eta + (a ? a.wait : 0));
+      const em = s.f.priority === 'mayday' || s.f.priority === 'medical';
+      let st = 'SEQ', cls = '';
+      if (x) {
+        if (x.status === 'holding') { st = '⟳ HOLD'; cls = 'hold'; }
+        else if (x.status === 'final') { st = '↓ FINAL'; cls = 'fin'; }
+        else if (x.status === 'air') { st = '✈ INBOUND'; }
+        else if (/taxi|rollout|hold-short/.test(x.status)) { st = '⇢ TAXI'; cls = 'land'; }
+      }
+      if (s.atfm > 1 && !x) { st = '⏱ ATFM ' + Math.round(s.atfm) + '′'; cls = 'fin'; }
+      if (em) st = (s.f.priority === 'mayday' ? '🆘 ' : '🚑 ') + st;
+      h += '<div class="sq' + (em ? ' em' : '') + (S.selected === s.id ? ' sel' : '') + '" data-id="' + s.id + '"><span>' + (s.pos + 1) + '</span><span class="fl"><i style="background:' + col(s.f) + '"></i>' + s.id + '</span><span>' + D.fmt(s.f.eta) + '</span><span class="' + (dl > 15 ? 'd2' : dl > 4 ? 'd1' : 'd0') + '">' + D.fmt(s.land) + '</span><span>' + (s.rwy === 'S' ? 'R' : 'L') + '</span><span' + (a && a.wait > 3 ? ' class="stw" title="waits ' + Math.round(a.wait) + ' min"' : '') + '>' + (a ? a.stand + (a.wait > 3 ? '⚠' : '') : '—') + '</span><span class="st ' + cls + '">' + st + '</span></div>';
+    });
+    $('#cmdSeq').innerHTML = h;
+    const avg = rows.length ? rows.reduce((q, s) => q + Math.max(0, s.land - s.f.eta), 0) / rows.length : 0;
+    $('#cmdSeqChip').textContent = 'next ' + rows.length + ' · avg +' + avg.toFixed(0) + '′';
+    document.querySelectorAll('#cmdSeq .sq[data-id]').forEach((r) => r.onclick = () => FA.app.select(r.dataset.id));
   }
 
   /* ---------- live event feed ---------- */
@@ -229,7 +273,9 @@
       const col = w.lvp ? '#ffb300' : '#66bb6a';
       g += '<circle cx="' + x + '" cy="' + y + '" r="' + (a.icao === 'OMDB' ? 7 : 5) + '" fill="' + col + '" stroke="#06101e" stroke-width="1.5"' + (w.lvp ? ' class="pulse"' : '') + '/><text x="' + (x + 8) + '" y="' + (y + 4) + '" fill="#cfe0f5" font-size="10" font-weight="700" font-family="JetBrains Mono">' + a.iata + (load[a.icao] ? ' +' + load[a.icao] : '') + '</text>';
     });
-    $('#cmdNet').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '">' + g + '</svg>';
+    const live = FA.live && FA.live.adsb;
+    if (live) live.forEach((p) => { if (p.lat < 22.5 || p.lat > 26.2 || p.lon < 51.4 || p.lon > 56.6) return; const [x, y] = P(p.lon, p.lat); g += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="1.6" fill="#ffee58" opacity=".85"/>'; });
+    $('#cmdNet').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' + g + (live ? '<text x="' + (W - 4) + '" y="' + (H - 4) + '" fill="#c9b94a" font-size="9" text-anchor="end" font-family="JetBrains Mono">● ' + live.length + ' live aircraft (OpenSky)</text>' : '') + '</svg>';
     $('#cmdNetChip').innerHTML = '<span class="chip ' + (plan.divs.length ? (ai ? 'cy' : 'red') : 'live') + '">' + (plan.divs.length ? plan.divs.length + ' DIVERTED' : '0 DIVERTED') + '</span>';
   }
 
@@ -337,19 +383,40 @@
     rpTimer = setTimeout(() => { if (card.classList.contains('rp')) card.hidden = true; }, 10000);
   }
 
+  /* ---------- evaluation: today vs FalconAero ---------- */
+  function renderEval() {
+    const S = FA.state, el = $('#cmdEval');
+    if (!el) return;
+    const ai = S.plans[S.active !== 'baseline' ? S.active : S.rec], b = S.plans.baseline;
+    const M = [
+      ['Avg delay', (k) => k.avgDelayAll, (v) => v.toFixed(1) + '′'],
+      ['Conflicts', (k) => k.conflicts, (v) => Math.round(v)],
+      ['Taxi conflicts', (k) => k.taxiConflicts, (v) => Math.round(v)],
+      ['Diversions', (k) => k.diversions, (v) => Math.round(v)],
+      ['CO₂', (k) => k.co2 / 1000, (v) => Math.round(v) + 't'],
+      ['Landed by 08:00', (k) => k.throughput, (v) => Math.round(v)]
+    ];
+    let h = '<div class="cmd-h"><span>EVALUATION</span><span class="chip ' + (S.approved ? 'live' : 'cy') + '">' + (S.approved ? 'APPROVED' : 'AI PROJECTION') + '</span></div><div class="ev-legend"><span><b style="background:#ef5350"></b>today</span><span><b style="background:#26c6da"></b>' + U.esc(ai.cfg.short) + '</span></div>';
+    M.forEach(([lb, f, fmt]) => {
+      const vb = f(b.kpi), va = f(ai.kpi), mx = Math.max(vb, va, 1e-6);
+      h += '<div class="ev"><span class="lb">' + lb + '</span><div class="bars"><div class="b base"><i style="width:' + (100 * vb / mx).toFixed(0) + '%"></i><span>' + fmt(vb) + '</span></div><div class="b ai"><i style="width:' + Math.max(2, 100 * va / mx).toFixed(0) + '%"></i><span>' + fmt(va) + '</span></div></div></div>';
+    });
+    el.innerHTML = h;
+  }
+
   /* ---------- tick ---------- */
   function onTick(t) {
     if (FA.state.view !== 'command') return;
     renderLive();
     renderStatus(t);
     const m = Math.floor(t);
-    if (m !== lastMin) { lastMin = m; renderFeed(t); renderTl(t); renderRes(t); }
+    if (m !== lastMin) { lastMin = m; renderFeed(t); renderTl(t); renderRes(t); renderSeq(t); }
     if (Math.abs(t - lastFog) >= 2) { lastFog = t; renderFog(t); }
   }
   function full() {
     const t = FA.state.t;
     lastMin = -1; lastFog = -99;
-    renderScn(); renderGo(); renderKpis(false); renderNet(); renderCard();
+    renderScn(); renderGo(); renderKpis(false); renderNet(); renderCard(); renderEval();
     renderRes(t);
     FA.map.render(t);
     onTick(t);
@@ -390,7 +457,9 @@
         $('#cmdOverlay').hidden = true;
         if (FA.state.view === 'command') { full(); renderKpis(true); }
       });
-      FA.bus.on('select', renderCard);
+      FA.bus.on('select', () => { renderCard(); renderSeq(FA.state.t); });
+      FA.bus.on('live', () => { renderHqLive(); renderNet(); lastFog = -99; if (FA.state.view === 'command') renderFog(FA.state.t); });
+      renderHqLive();
       FA.bus.on('replan', (rp) => { shown = new Set(); if (FA.state.view === 'command') { full(); renderKpis(true); replanCard(rp); } });
       FA.bus.on('view', (v) => { if (v !== 'command') hostMap(false); });
     },

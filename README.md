@@ -27,20 +27,23 @@ The pain is real and recent. Fog forced **19 inbound diversions at DXB on 20 Nov
 
 ---
 
-## 2. What you can do in the prototype
+## 2. One screen: the FalconAero command dashboard
 
-| Tab | What it shows |
+Everything lives on a single control-room dashboard. There are no tabs and no pages to explain.
+
+| Area | What it shows |
 |---|---|
-| ⚡ **Command** (landing screen) | One-screen presentation dashboard: live airport map, 6 big KPIs, AI fog radar, live AI-action feed, **runway status and resource utilisation**, UAE network mini-map, **⚡ AI RECOVER → plan cards → ✔ APPROVE**, and a **BEFORE ⟷ AFTER** toggle. **Click any stand or runway to disrupt it**: every plan is re-computed instantly and the reassignments and alternatives pop up. Click any aircraft for a compact "why" card |
-| 🛰 **Ops Center** | Live digital twin of DXB (stylised): 80 arrivals and 54 departures, 70 stands, 2 runways and taxiways, animated aircraft, fog layer. Five scenarios: Normal, Dense Fog (CAT III / LVP), Shamal sandstorm, Runway closure, **Perfect Storm** (fog + MAYDAY fuel + medical + jet-bridge failure). AI fog nowcast with reasons. One-click recovery plans, **Approve / Modify / Reject**, click any aircraft for **"Why?"**. **Copilot** takes text or 🎤 voice, in English or Arabic, for briefings and what-ifs ("close runway 30R for 40 min") |
-| 🧠 **Recovery Plans** | Four complete plans side by side (current practice, Balanced, Min-Delay, Max-Safety): 20 KPIs, trade-off radar, runway-sequence waterfall (airborne holding vs ground delay), stand-allocation Gantt chart, full decision log |
-| 🇦🇪 **UAE Network** | National view across 7 UAE airports: live METAR and ADS-B traffic, alternate scoring (weather, Code-F stands, apron capacity), diversion flows for current practice vs FalconAero |
-| 📊 **Data & Evidence** | Official **GCAA open data from Bayanat** (movements, passengers, daily international movements), 11 years of real OMDB METARs, an original **fog-impact study**, data pipeline, data catalogue and data gaps |
-| 🧪 **Innovation Lab** | Idea pipeline (Submitted → Sandbox-tested → Validated → Pilot → Scaled), experiment builder with 8 policy levers, paired Monte-Carlo trials with 95% bootstrap confidence intervals, safety guardrails, readiness score, printable evidence pack, recognition board |
-| ⚖ **Responsible AI** | Principles mapped to working mechanisms, live **SHA-256 hash-chained audit trail** (verify / simulate tampering / export), human-oversight metrics, airline fairness dashboard, model cards, a list of what the AI will never do |
-| 📈 **Impact & Roadmap** | Live benchmark (32 disruption days), annualised value with editable assumptions, **90-day pilot plan**, risk register, business model canvas and pricing, strategic alignment |
+| **Header** | Scenario selector (Normal · Fog · Sandstorm · Runway closed · Perfect Storm), live status pills (LVP / closures / blocked aircraft / AI plan active), live-data indicator, sim clock, **▶ DEMO** |
+| **KPI strip** | Avg delay · diversions · conflicts · min fuel margin · CO₂ · missed connections, plus the **⚡ AI RECOVER → plan cards → ✔ APPROVE** control and a **BEFORE ⟷ AFTER** toggle |
+| **Airport twin (center)** | Runways, taxiway network, 70 stands, animated aircraft (holding, final, taxi, hold-short, towing), fog layer, live counters, timeline. **Click a stand or runway** to take it out of service: every plan is recomputed instantly and the reassignments and alternatives pop up. Click any aircraft for its "why" card |
+| **AI fog radar** | Fog probability for the next 60 min (model trained on 11 years of real OMDB METARs), RVR, trend, live OMDB weather |
+| **Resources** | Runway status and mode (ARR / DEP / MIXED / CLOSED), runway, stand and taxiway utilisation |
+| **Evaluation** | Today's practice vs FalconAero for the current scenario: delay, conflicts, taxi conflicts, diversions, CO₂, throughput |
+| **UAE network** | 7 UAE airports, weather state, diversion arcs, live aircraft positions over the UAE |
+| **Live AI actions** | Streaming feed: incidents (today) or AI actions (towing, mixed-mode runway, early diversions, re-plans) |
+| **Arrival sequence** | Next arrivals with sequence position, ETA vs landing (predicted delay), runway, stand and live status |
 
----
+*(The engine also ships deeper analysis modules in `js/`: plan comparison, network, data, innovation sandbox, governance and impact. They are not shown in the dashboard UI.)*
 
 ## 3. Innovations (what's new)
 

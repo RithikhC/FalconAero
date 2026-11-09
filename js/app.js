@@ -256,7 +256,7 @@
     Object.keys(FA.views).forEach((id) => { if (FA.views[id].init) FA.views[id].init(); });
     const hash = (location.hash || '').replace('#', '');
     FA.app.loadScenario(FA.state.scenarioId, FA.state.seed);
-    FA.app.setView(FA.views[hash] ? hash : 'command');
+    FA.app.setView('command'); void hash;
     requestAnimationFrame(loop);
     if (/demo/.test(location.search) && FA.demo) setTimeout(() => FA.demo.start(), 600);
   }
