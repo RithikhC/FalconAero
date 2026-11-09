@@ -54,6 +54,7 @@
     clearTimeout(timer); clearTimeout(sub); cancelAnimationFrame(raf);
     i = Math.max(0, Math.min(STEPS.length - 1, n));
     const s = STEPS[i];
+    if (FA.map.override && FA.views.command.phase === 'active') FA.views.command.toggleCompare('ai'); // never leave the screen stuck on BEFORE
     if (FA.state.view !== s.view) FA.app.setView(s.view);
     try { s.run(); } catch (e) { console.warn('demo step', e); }
     setTimeout(() => {
