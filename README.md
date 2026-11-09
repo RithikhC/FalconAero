@@ -31,6 +31,7 @@ The pain is real and recent. Fog forced **19 inbound diversions at DXB on 20 Nov
 
 | Tab | What it shows |
 |---|---|
+| ⚡ **Command** (landing screen) | One-screen presentation dashboard: live airport map, 6 big KPIs, AI fog radar, live AI-action feed, UAE network mini-map, **⚡ AI RECOVER → plan cards → ✔ APPROVE**, and a **BEFORE ⟷ AFTER** toggle. Click any aircraft for a compact "why" card |
 | 🛰 **Ops Center** | Live digital twin of DXB (stylised): 80 arrivals and 54 departures, 70 stands, 2 runways and taxiways, animated aircraft, fog layer. Five scenarios: Normal, Dense Fog (CAT III / LVP), Shamal sandstorm, Runway closure, **Perfect Storm** (fog + MAYDAY fuel + medical + jet-bridge failure). AI fog nowcast with reasons. One-click recovery plans, **Approve / Modify / Reject**, click any aircraft for **"Why?"**. **Copilot** takes text or 🎤 voice, in English or Arabic, for briefings and what-ifs ("close runway 30R for 40 min") |
 | 🧠 **Recovery Plans** | Four complete plans side by side (current practice, Balanced, Min-Delay, Max-Safety): 20 KPIs, trade-off radar, runway-sequence waterfall (airborne holding vs ground delay), stand-allocation Gantt chart, full decision log |
 | 🇦🇪 **UAE Network** | National view across 7 UAE airports: live METAR and ADS-B traffic, alternate scoring (weather, Code-F stands, apron capacity), diversion flows for current practice vs FalconAero |

@@ -244,7 +244,7 @@
   function render(t) {
     const S = FA.state;
     if (!S.inst || !svg) return;
-    const plan = S.plans[S.active];
+    const plan = S.plans[(FA.map && FA.map.override && S.plans[FA.map.override]) ? FA.map.override : S.active];
     if (poolPlan !== plan) { gAc.innerHTML = ''; pool.clear(); poolPlan = plan; }
     const c = E.conditions(S.inst, t);
     // layers
@@ -334,13 +334,13 @@
       svg = document.getElementById('map');
       svg.addEventListener('click', () => FA.app.select(null));
       FA.bus.on('scenario', () => { drawStatic(); render(FA.state.t); });
-      FA.bus.on('tick', (t) => { if (FA.state.view === 'ops') render(t); });
+      FA.bus.on('tick', (t) => { if (FA.state.view === 'ops' || FA.state.view === 'command') render(t); });
       FA.bus.on('approved', () => render(FA.state.t));
       FA.bus.on('generated', () => render(FA.state.t));
       FA.bus.on('select', () => render(FA.state.t));
-      FA.bus.on('view', (v) => { if (v === 'ops') render(FA.state.t); });
+      FA.bus.on('view', (v) => { if (v === 'ops' || v === 'command') render(FA.state.t); });
       document.getElementById('labelsToggle').addEventListener('change', () => render(FA.state.t));
     },
-    render, aircraftAt, lastAircraft: []
+    render, aircraftAt, lastAircraft: [], override: null
   };
 })(window.FA);

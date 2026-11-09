@@ -5,6 +5,13 @@ Backup: a local copy (open `index.html`) works fully offline.
 
 ---
 
+## Fastest way to present
+Open the site. It lands on the **Command** dashboard. Either press **▶ Guided Demo** (13 short captioned steps, ~90 s) and talk over it, or drive it yourself:
+1. Click **⚠ Perfect Storm**, press ▶ (2×), and let the fog roll in (watch the fog radar and red KPIs).
+2. Press **⚡ AI RECOVER**, then **✔ APPROVE**. The KPIs flip green.
+3. Flip **BEFORE / AFTER** to show the difference on the map.
+4. Click an aircraft for its "why" card.
+
 ## Script (≈ 3:00)
 
 | Time | Demo step | Say (adapt, don't read) |

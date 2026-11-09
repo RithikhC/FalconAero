@@ -16,7 +16,7 @@
     viewPlan: 'balanced',     // plan highlighted in the AI panel / plans page
     generated: false,         // has the controller asked the AI for plans?
     approved: null,           // {planId, by, at}
-    t: 300, playing: false, speed: 60, selected: null, view: 'ops'
+    t: 300, playing: false, speed: 120, selected: null, view: 'command'
   };
 
   /* ---------- SHA-256 (sync, for the tamper-evident audit chain) ---------- */
@@ -123,6 +123,7 @@
       FA.state.view = id;
       $$('#tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === id));
       $$('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + id));
+      document.body.classList.toggle('cmd-mode', id === 'command');
       const v = FA.views[id];
       if (v) {
         if (!mounted[id] && v.mount) { v.mount(document.getElementById(({ network: 'networkRoot', data: 'dataRoot', lab: 'labRoot', gov: 'govRoot', impact: 'impactRoot' })[id] || ('view-' + id))); mounted[id] = true; }
@@ -206,7 +207,7 @@
     Object.keys(FA.views).forEach((id) => { if (FA.views[id].init) FA.views[id].init(); });
     const hash = (location.hash || '').replace('#', '');
     FA.app.loadScenario(FA.state.scenarioId, FA.state.seed);
-    FA.app.setView(FA.views[hash] ? hash : 'ops');
+    FA.app.setView(FA.views[hash] ? hash : 'command');
     requestAnimationFrame(loop);
     if (/demo/.test(location.search) && FA.demo) setTimeout(() => FA.demo.start(), 600);
   }
