@@ -275,17 +275,36 @@
      2. Departures: runway slots + off-block policy
      ========================================================= */
   function planDepartures(inst, cfg, mixedWins) {
-    const deps = inst.departures.slice().sort((a, b) => a.std - b.std);
-    let tLast = -1e9;
-    const res = [];
-    deps.forEach((d) => {
-      const s = standById(inst, d.stand);
-      const txo = taxiOut(inst, s, d.std);
-      const earliest = d.std + txo;
-      const tto = Math.max(earliest, tLast + depInterval(inst, Math.max(earliest, tLast), mixedWins));
-      tLast = tto;
-      res.push({ id: d.id, f: d, stand: d.stand, ttot: tto, taxiOut: txo, delay: tto - earliest });
+    // ICAO time-based departure wake separation: 2 min behind Heavy (for Medium), 3 min behind Super (A380)
+    const depSep = (L, F, t) => {
+      const base = depInterval(inst, t, mixedWins);
+      if (!L) return 0;
+      const wake = L.wake === 'J' ? 3 : (L.wake === 'H' && F.wake === 'M') ? 2 : 0;
+      return Math.max(base, wake);
+    };
+    const pend = inst.departures.slice().sort((a, b) => a.std - b.std).map((d) => {
+      const txo = taxiOut(inst, standById(inst, d.stand), d.std);
+      return { d, txo, earliest: d.std + txo, skipped: 0 };
     });
+    let tLast = -1e9, leader = null;
+    const res = [];
+    const k = cfg.mode === 'opt' ? 3 : 0;  // constrained position shifting on departures too
+    while (pend.length) {
+      let win = pend.slice(0, k + 1);
+      const forced = win.find((p) => p.skipped >= k && k > 0);
+      if (forced) win = [forced];
+      let best = null;
+      win.forEach((p) => {
+        const tto = Math.max(p.earliest, tLast + depSep(leader, p.d, Math.max(p.earliest, tLast)));
+        // pick the departure that frees the runway soonest, lightly preferring the earlier-ready one
+        const score = cfg.mode === 'opt' ? tto + (p.earliest - pend[0].earliest) * 0.15 : p.earliest;
+        if (!best || score < best.score) best = { p, tto, score };
+      });
+      pend.slice(0, pend.indexOf(best.p)).forEach((q) => { q.skipped++; });
+      pend.splice(pend.indexOf(best.p), 1);
+      tLast = best.tto; leader = best.p.d;
+      res.push({ id: best.p.d.id, f: best.p.d, stand: best.p.d.stand, ttot: best.tto, taxiOut: best.p.txo, delay: best.tto - best.p.earliest });
+    }
     // off-block times
     res.forEach((r, i) => {
       if (cfg.mode === 'baseline') {
@@ -475,6 +494,7 @@
     plan.seqById = new Map(seq.map((s) => [s.id, s]));
     plan.depById = new Map(deps.map((d) => [d.id, d]));
     plan.divById = new Map(divs.map((d) => [d.id, d]));
+    if (FA.taxi) FA.taxi.planMoves(plan); // taxiway network routing + conflict detection
     taxiCongestion(plan);
     plan.kpi = kpis(plan);
     plan.ms = performance.now() - t0;
@@ -568,7 +588,12 @@
       remoteCount: alloc.filter((a) => a.remote).length,
       minFuelMargin: minMargin, emergDelay, fairness: Math.max(0, 1 - g), gini: g,
       fuelCritical: divs.filter((d) => d.reactive).length,
-      mixedMin: (plan.mixedWins || []).reduce((a, w) => a + (w[1] - w[0]), 0)
+      mixedMin: (plan.mixedWins || []).reduce((a, w) => a + (w[1] - w[0]), 0),
+      taxiConflicts: (plan.taxiConflicts || []).length,
+      avgTaxi: plan.taxiStats ? plan.taxiStats.avgTaxi : 0,
+      taxiWait: plan.taxiStats ? plan.taxiStats.waitMin : 0,
+      throughput: seq.filter((s) => s.land <= plan.inst.T1).length,
+      standUtil: (() => { let o = 0, n = 0; for (let t = plan.inst.T0; t <= plan.inst.T1; t += 15) { let occ = 0, av = 0; plan.tl.forEach((ivs) => { const c = ivs.find((iv) => t >= iv.start && t < iv.end); if (c && c.kind === 'outage') return; av++; if (c) occ++; }); o += occ / Math.max(1, av); n++; } return (100 * o) / Math.max(1, n); })()
     };
     k.scores = scores(k);
     return k;

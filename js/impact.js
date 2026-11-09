@@ -48,7 +48,10 @@
     { key: 'standConflicts', label: 'Stand conflicts', unit: '', d: 1, hint: 'aircraft held waiting for a gate' },
     { key: 'co2t', label: 'CO₂ emitted', unit: 't', d: 0, hint: 'holding + queues + diversions' },
     { key: 'missedConn', label: 'Missed connections', unit: 'pax', d: 0, hint: 'transfer passengers' },
-    { key: 'emergDelay', label: 'Emergency landing delay', unit: 'min', d: 1, hint: 'MAYDAY / PAN after ETA' }
+    { key: 'emergDelay', label: 'Emergency landing delay', unit: 'min', d: 1, hint: 'MAYDAY / PAN after ETA' },
+    { key: 'taxiConflicts', label: 'Taxi conflicts', unit: '', d: 1, hint: 'head-on / crossing / spacing on the taxiway network' },
+    { key: 'throughput', label: 'Arrivals landed by 08:00', unit: '', d: 1, hint: 'runway throughput in the disrupted window', higher: true },
+    { key: 'contactPct', label: 'Contact-stand utilisation', unit: '%', d: 0, hint: 'arrivals at a gate with jet bridge', higher: true }
   ];
   const getV = (k, key) => (key === 'co2t' ? k.co2 / 1000 : key === 'totalDelay' ? k.avgDelayAll * (k.landed + k.diversions) : k[key]);
 
@@ -132,7 +135,7 @@
     const cards = METRICS.map((m) => {
       const b = A.base[m.key], r = A.rec[m.key];
       const p = b ? Math.round((100 * (r - b)) / b) : 0;
-      const good = r <= b;
+      const good = m.higher ? r >= b : r <= b;
       const big = Math.abs(b) < 1e-6 ? (r < 1e-6 ? '±0' : '+' + num(r, m.d)) : (p > 0 ? '+' : '') + p + '%';
       return '<div class="im-card"><div class="l">' + esc(m.label) + '</div><div class="v ' + (good ? 'good' : 'bad') + '">' + big + '</div><div class="s">' + num(b, m.d) + ' → ' + num(r, m.d) + ' ' + esc(m.unit) + '</div><div class="src">' + esc(m.hint) + '</div></div>';
     }).join('');

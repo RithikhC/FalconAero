@@ -139,7 +139,7 @@
       S.inst = FA.data.generate(id, S.seed);
       const res = FA.engine.buildAll(S.inst);
       S.plans = res.plans; S.rec = res.rec; S.viewPlan = res.rec;
-      S.active = 'baseline'; S.generated = false; S.approved = null; S.selected = null;
+      S.active = 'baseline'; S.generated = false; S.approved = null; S.selected = null; S.replans = [];
       S.t = (opts && opts.t != null) ? opts.t : 300;
       FA.audit.add('SCENARIO', 'system', 'Loaded scenario "' + S.inst.scenario.name + '" (seed ' + S.seed + '): ' + S.inst.arrivals.length + ' arrivals, ' + S.inst.departures.length + ' departures');
       FA.bus.emit('scenario', S);
@@ -174,6 +174,55 @@
       FA.ui.toast('Plans rejected', 'Feedback logged for model review. Operations continue under current procedures.', 'amber');
       FA.bus.emit('generated', S);
       FA.bus.emit('tick', S.t);
+    },
+
+    /** Live disruption → re-plan every option instantly, keep the human decision state. */
+    replan(reason, icon) {
+      const S = FA.state;
+      const before = S.plans[S.active];
+      const t0 = performance.now();
+      const res = FA.engine.buildAll(S.inst);
+      const ms = performance.now() - t0;
+      if (S.active === 'custom') { S.active = res.rec; if (S.approved) S.approved.planId = res.rec; }
+      S.plans = res.plans; S.rec = res.rec;
+      if (!S.plans[S.viewPlan]) S.viewPlan = res.rec;
+      const after = S.plans[S.active];
+      const changes = [];
+      after.alloc.forEach((a) => {
+        const b = before.allocById.get(a.id);
+        if (b && b.stand !== a.stand) changes.push({ id: a.id, from: b.stand, to: a.stand, alts: (a.alts || []).slice(0, 2).map((x) => x.stand) });
+      });
+      after.divs.forEach((d) => { if (!before.divById.get(d.id)) changes.push({ id: d.id, from: '—', to: '↗' + d.alt, alts: [] }); });
+      const stranded = S.active === 'baseline' ? after.conflicts.filter((c) => c.type === 'stand').length - before.conflicts.filter((c) => c.type === 'stand').length : 0;
+      const rp = { t: S.t, reason, icon: icon || '🔧', ms, changes, stranded, planId: S.active };
+      (S.replans = S.replans || []).push(rp);
+      FA.audit.add('REPLAN', 'FalconAero', reason + ' → re-planned all options in ' + Math.round(ms) + ' ms (' + changes.length + ' changes to active plan)');
+      FA.bus.emit('replan', rp);
+      FA.bus.emit('tick', S.t);
+      return rp;
+    },
+
+    toggleStand(id) {
+      const S = FA.state, st = S.inst.stands.find((x) => x.id === id);
+      if (!st) return;
+      const t = Math.max(300, Math.round(S.t));
+      const ev = S.inst.events.find((e) => e.type === 'standOutage' && e.user && e.stands[0] === id);
+      if (ev) {
+        st.outOfService = false; st.outage = null;
+        S.inst.events = S.inst.events.filter((e) => e !== ev);
+        return FA.app.replan('Stand ' + id + ' back in service', '✅');
+      }
+      st.outOfService = true; st.outage = { start: t, end: 600 };
+      S.inst.events = S.inst.events.concat([{ type: 'standOutage', stands: [id], start: t, end: 600, user: true }]);
+      return FA.app.replan('Stand ' + id + ' unavailable', '🔧');
+    },
+
+    toggleRunway() {
+      const S = FA.state, t = Math.max(300, Math.round(S.t));
+      const ev = S.inst.events.find((e) => e.type === 'rwyClosure' && e.user && t >= e.start && t < e.end);
+      if (ev) { ev.end = t; return FA.app.replan('Runway 12L/30R re-opened', '✅'); }
+      S.inst.events = S.inst.events.concat([{ type: 'rwyClosure', rwy: 'N', start: t, end: t + 45, user: true }]);
+      return FA.app.replan('Runway 12L/30R closed for 45 min', '⛔');
     },
 
     select(flightId) {

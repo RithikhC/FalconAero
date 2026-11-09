@@ -24,7 +24,12 @@
     ['Contact-stand share (%)', (k) => k.contactPct, 0, false],
     ['Tows / remote stands', (k) => k.tows + ' / ' + k.remoteCount, null, null],
     ['Airline fairness index', (k) => k.fairness, 2, false],
-    ['Mixed-mode minutes', (k) => k.mixedMin, 0, null]
+    ['Mixed-mode minutes', (k) => k.mixedMin, 0, null],
+    ['Taxi conflicts (head-on / crossing / spacing)', (k) => k.taxiConflicts, 0, true],
+    ['Avg taxi time (min)', (k) => k.avgTaxi, 1, true],
+    ['Hold-short waits used to deconflict (min)', (k) => k.taxiWait, 1, null],
+    ['Arrivals landed by 08:00', (k) => k.throughput, 0, false],
+    ['Stand utilisation (avg %)', (k) => k.standUtil, 0, null]
   ];
 
   function ids() { return ['baseline', 'balanced', 'mindelay', 'safety'].concat(FA.state.plans.custom ? ['custom'] : []); }

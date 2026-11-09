@@ -66,6 +66,9 @@
     };
     rwy(G.rwyN, '12L/30R', 'PRIMARY ARRIVALS');
     rwy(G.rwyS, '12R/30L', 'PRIMARY DEPARTURES');
+    const hit = el('rect', { x: G.rwyN.x1, y: G.rwyN.y - 14, width: G.rwyN.x2 - G.rwyN.x1, height: 28, fill: 'transparent', style: 'cursor:pointer' }, gStatic);
+    el('title', {}, hit).textContent = 'Runway 12L/30R · click to close for 45 min';
+    hit.addEventListener('click', (e) => { e.stopPropagation(); FA.app.toggleRunway(); });
 
     // holding stacks
     G.holdStacks.forEach((s) => {
@@ -85,7 +88,9 @@
     standEls.clear();
     const inst = FA.state.inst;
     inst.stands.forEach((s) => {
-      const g = el('g', { 'data-stand': s.id }, gStands);
+      const g = el('g', { 'data-stand': s.id, style: 'cursor:pointer' }, gStands);
+      g.addEventListener('click', (e) => { e.stopPropagation(); FA.app.toggleStand(s.id); });
+      el('title', {}, g).textContent = 'Stand ' + s.id + ' (Code ' + s.code + ') · click to mark unavailable';
       if (s.contact) el('line', { x1: s.x, y1: s.side === 'top' ? s.y + 9 : s.y - 9, x2: s.x, y2: s.side === 'top' ? s.y + 24 : s.y - 24, stroke: '#2b4166', 'stroke-width': 3 }, g);
       const w = s.code === 'F' ? 30 : s.code === 'E' ? 26 : 20;
       const r = el('rect', { x: s.x - w / 2, y: s.y - 10, width: w, height: 20, rx: 3, class: 'stand-rect', fill: '#0f1b2f' }, g);
@@ -153,13 +158,18 @@
     if (t < s.land) { Object.assign(st, lerp(faf, thr, (t - (s.land - 4)) / 4), { status: 'final' }); return st; }
     if (!a) return null;
     const stand = E.standById(inst, a.stand);
+    const mv = plan.moves && plan.moves.get(f.id);
+    if (mv) {
+      if (t < mv.tEnd) { const p = FA.taxi.at(mv, t); Object.assign(st, p, { status: p.holding ? 'hold-short' : t < mv.ts[1] ? 'rollout' : 'taxi-in', route: mv.pts }); return st; }
+      if (t < a.onBlock) { const q = mv.pts[Math.max(0, mv.pts.length - 2)]; Object.assign(st, { x: q[0], y: q[1], a: 0 }, { status: 'waiting', route: mv.pts, conflict: plan.cfg.mode === 'baseline' }); return st; }
+    }
     const route = E.routeIn(stand, s.rwy);
     const ti = a.taxiIn;
-    if (t < s.land + ti) {
+    if (!mv && t < s.land + ti) {
       const p = E.pointAt(route, (t - s.land) / ti);
       Object.assign(st, p, { status: 'taxi-in', route }); return st;
     }
-    if (t < a.onBlock) {
+    if (!mv && t < a.onBlock) {
       const p = E.pointAt(route, 0.93);
       Object.assign(st, p, { status: 'waiting', route, conflict: plan.cfg.mode === 'baseline' }); return st;
     }
@@ -194,9 +204,11 @@
     }
     const at = d.towedTo && t >= d.towAt + 12 ? cur : s0;
     if (t < d.offBlock) { Object.assign(st, { x: at.x, y: at.y, a: at.side === 'top' ? Math.PI / 2 : -Math.PI / 2 }); return st; }
+    const mvd = plan.moves && plan.moves.get(f.id);
+    if (mvd && t < mvd.tEnd) { const p = FA.taxi.at(mvd, t); Object.assign(st, p, { status: p.holding ? 'hold-short' : 'taxi-out', route: mvd.pts }); return st; }
     const route = E.routeOut(at);
     const txo = d.taxiOut;
-    if (t < d.offBlock + txo) { Object.assign(st, E.pointAt(route, (t - d.offBlock) / txo), { status: 'taxi-out', route }); return st; }
+    if (!mvd && t < d.offBlock + txo) { Object.assign(st, E.pointAt(route, (t - d.offBlock) / txo), { status: 'taxi-out', route }); return st; }
     if (t < d.ttot - 0.7) {
       const qi = queueIdx.get(f.id) || 0;
       Object.assign(st, { x: G.holdS.x + 26 + qi * 24, y: G.twyS, a: Math.PI, status: 'queue' });
@@ -291,6 +303,7 @@
       else if (a.status === 'waiting' && a.conflict) ring = '#ef5350';
       else if (a.status === 'holding') ring = a.lowFuel ? '#ef5350' : '#ffb300';
       else if (a.status === 'tow') { ring = '#ffee58'; dash = '3 2'; }
+      else if (a.status === 'hold-short') { ring = '#26c6da'; dash = '2 2'; }
       else if (a.f.priority === 'state') ring = '#e2b04a';
       if (S.selected === a.id) ring = '#ffffff';
       halo.setAttribute('stroke', ring);
@@ -299,7 +312,7 @@
       const tx = g.querySelector('text');
       const moving = a.status !== 'parked';
       tx.style.display = (showLbl && (moving || S.selected === a.id)) ? '' : 'none';
-      tx.textContent = a.f.id + (a.status === 'diverting' ? ' → ' + a.alt : a.status === 'holding' ? ' ⟳' : a.status === 'tow' ? ' 🚜' : '');
+      tx.textContent = a.f.id + (a.status === 'diverting' ? ' → ' + a.alt : a.status === 'holding' ? ' ⟳' : a.status === 'tow' ? ' 🚜' : a.status === 'hold-short' ? ' ⏸' : '');
     });
     pool.forEach((g, id) => { if (!seen.has(id)) g.style.display = 'none'; });
 
@@ -309,12 +322,18 @@
       const a = acs.find((x) => x.id === S.selected);
       const al = plan.allocById.get(S.selected);
       const sq = plan.seqById.get(S.selected);
-      let route = a && a.route;
+      const smv = plan.moves && plan.moves.get(S.selected);
+      let route = (a && a.route) || (smv && smv.pts);
       if (!route && al && sq) route = E.routeIn(E.standById(S.inst, al.stand), sq.rwy);
       if (route) el('path', { d: 'M' + route.map((p) => p.join(',')).join(' L'), class: 'route' }, gRoute);
       if (al) { const s = E.standById(S.inst, al.stand); el('rect', { x: s.x - 18, y: s.y - 14, width: 36, height: 28, rx: 5, fill: 'none', stroke: '#00e5ff', 'stroke-width': 2, class: 'pulse' }, gRoute); }
     }
 
+    // ground-movement conflicts (current practice) flash where and when they happen
+    (plan.taxiConflicts || []).filter((c) => Math.abs(c.t - t) < 1.2).forEach((c) => {
+      el('circle', { cx: c.x, cy: c.y, r: 13, fill: 'rgba(239,83,80,.25)', stroke: '#ef5350', 'stroke-width': 2, class: 'pulse' }, gRoute);
+      el('text', { x: c.x, y: c.y + 4, fill: '#fff', 'font-size': 11, 'font-weight': 800, 'text-anchor': 'middle' }, gRoute).textContent = '!';
+    });
     // banner
     const b = [];
     if (c.lvp) b.push('<span class="b lvp">LVP ACTIVE · CAT III · RVR ' + c.rvr + ' m</span>');
@@ -323,6 +342,8 @@
     else if (mixed) b.push('<span class="b cy">AI: 12R/30L MIXED MODE</span>');
     const waiting = acs.filter((a) => a.status === 'waiting' && a.conflict).length;
     if (waiting) b.push('<span class="b red">' + waiting + ' AIRCRAFT BLOCKED — STAND CONFLICT</span>');
+    const tc = (plan.taxiConflicts || []).filter((c) => Math.abs(c.t - t) < 1.2).length;
+    if (tc) b.push('<span class="b red">' + tc + ' TAXI CONFLICT' + (tc > 1 ? 'S' : '') + '</span>');
     const holding = acs.filter((a) => a.status === 'holding').length;
     if (holding >= 3) b.push('<span class="b lvp">' + holding + ' HOLDING</span>');
     document.getElementById('mapBanner').innerHTML = b.join('');
@@ -334,6 +355,7 @@
       svg = document.getElementById('map');
       svg.addEventListener('click', () => FA.app.select(null));
       FA.bus.on('scenario', () => { drawStatic(); render(FA.state.t); });
+      FA.bus.on('replan', () => render(FA.state.t));
       FA.bus.on('tick', (t) => { if (FA.state.view === 'ops' || FA.state.view === 'command') render(t); });
       FA.bus.on('approved', () => render(FA.state.t));
       FA.bus.on('generated', () => render(FA.state.t));

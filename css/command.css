@@ -144,3 +144,27 @@ body.cmd-mode .toast-wrap { display: none; }
 .cmd-plan .m { font-size: 11.5px; }
 .demo-text { font-size: 17px; font-weight: 600; }
 .demo-text b { color: #ffd77a; }
+
+/* resources / runway status */
+.cmd-rail { grid-template-rows: auto minmax(0, 1fr) auto auto; }
+.cr { display: grid; grid-template-columns: 74px 46px 1fr 38px; align-items: center; gap: 6px; font-size: 11.5px; margin: 5px 0; }
+.cr .n { font-family: var(--mono); font-weight: 700; color: #cfe0f5; }
+.cr .m { font-size: 9.5px; font-weight: 800; letter-spacing: .06em; text-align: center; padding: 2px 0; border-radius: 4px; background: rgba(255,255,255,.06); color: var(--muted); }
+.cr .m.closed { background: rgba(239,83,80,.2); color: #ff8a80; }
+.cr .m.mixed { background: rgba(38,198,218,.18); color: #7ff1ff; }
+.cr .bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,.06); overflow: hidden; }
+.cr .bar i { display: block; height: 100%; border-radius: 4px; transition: width .5s; }
+.cr .p { font-family: var(--mono); font-weight: 700; text-align: right; }
+.cmd-card.rp { border-color: var(--gold); width: 300px; }
+.cmd-card .rows { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.cmd-card .rows div { display: grid; grid-template-columns: 62px 1fr; gap: 6px; font-family: var(--mono); font-size: 12px; padding: 4px 6px; border-radius: 6px; background: rgba(255,255,255,.04); }
+.cmd-card .rows .alt { color: var(--dim); font-size: 11px; }
+.cmd-hint { position: absolute; right: 18px; bottom: 16px; font-size: 11px; color: var(--dim); background: rgba(6,14,26,.8); padding: 4px 9px; border-radius: 7px; border: 1px solid var(--line); pointer-events: none; }
+@media (max-height: 780px) { .cr { margin: 3px 0; } .cmd-res .cmd-h { margin-bottom: 4px; } }
+/* rail balance: keep the live feed readable */
+.cmd-rail { grid-template-rows: auto minmax(130px, 1fr) auto auto; }
+.cmd-fog-row .gauge { width: 82px; height: 82px; }
+.cmd-net svg { max-height: 96px; }
+.cmd-rail .panel { padding: 8px 12px; }
+.cmd-fog-sub { margin-bottom: 4px; }
+@media (max-height: 820px) { .cmd-net { display: none; } .cmd-rail { grid-template-rows: auto minmax(120px, 1fr) auto; } }

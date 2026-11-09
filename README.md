@@ -31,7 +31,7 @@ The pain is real and recent. Fog forced **19 inbound diversions at DXB on 20 Nov
 
 | Tab | What it shows |
 |---|---|
-| ⚡ **Command** (landing screen) | One-screen presentation dashboard: live airport map, 6 big KPIs, AI fog radar, live AI-action feed, UAE network mini-map, **⚡ AI RECOVER → plan cards → ✔ APPROVE**, and a **BEFORE ⟷ AFTER** toggle. Click any aircraft for a compact "why" card |
+| ⚡ **Command** (landing screen) | One-screen presentation dashboard: live airport map, 6 big KPIs, AI fog radar, live AI-action feed, **runway status and resource utilisation**, UAE network mini-map, **⚡ AI RECOVER → plan cards → ✔ APPROVE**, and a **BEFORE ⟷ AFTER** toggle. **Click any stand or runway to disrupt it**: every plan is re-computed instantly and the reassignments and alternatives pop up. Click any aircraft for a compact "why" card |
 | 🛰 **Ops Center** | Live digital twin of DXB (stylised): 80 arrivals and 54 departures, 70 stands, 2 runways and taxiways, animated aircraft, fog layer. Five scenarios: Normal, Dense Fog (CAT III / LVP), Shamal sandstorm, Runway closure, **Perfect Storm** (fog + MAYDAY fuel + medical + jet-bridge failure). AI fog nowcast with reasons. One-click recovery plans, **Approve / Modify / Reject**, click any aircraft for **"Why?"**. **Copilot** takes text or 🎤 voice, in English or Arabic, for briefings and what-ifs ("close runway 30R for 40 min") |
 | 🧠 **Recovery Plans** | Four complete plans side by side (current practice, Balanced, Min-Delay, Max-Safety): 20 KPIs, trade-off radar, runway-sequence waterfall (airborne holding vs ground delay), stand-allocation Gantt chart, full decision log |
 | 🇦🇪 **UAE Network** | National view across 7 UAE airports: live METAR and ADS-B traffic, alternate scoring (weather, Code-F stands, apron capacity), diversion flows for current practice vs FalconAero |
@@ -49,13 +49,16 @@ The pain is real and recent. Fog forced **19 inbound diversions at DXB on 20 Nov
 3. **Predict, don't react.** A fog nowcast **trained on 11 years of real OMDB METARs** (time-split validated on 2023–2025: ROC-AUC 0.999, caught 5 of 6 fog onsets an hour ahead) raises the alert ~30 min before visibility collapses. FalconAero then turns airborne holding into **ATFM ground delay at origin** for short-haul flights that haven't departed yet.
 4. **Fuel-aware, priority-aware sequencing.** A lookahead heuristic with constrained position shifting (±k fairness bound) weighs MAYDAY and medical flights, fuel slack, wake pairs, passengers and transfer connections.
 5. **Proactive, network-aware diversions.** It decides 25 min before arrival rather than at minimum fuel. It picks the flight with the least passenger impact and an alternate scored on weather, Code-F stands and apron load, so aircraft are never sent into another fog bank.
-6. **Regret-based stand allocation with towing.** Hard constraints cover ICAO Annex 14 code letters, outages and buffers. Soft costs cover remote/bussing, airline terminal, code waste, ambulance access and transfer walk.
-7. **Explainable by default.** Every decision shows its reasons, the alternatives rejected and what current practice would have done. The fog model shows each factor's contribution.
-8. **Stress-tested plans.** Monte-Carlo ETA-noise runs report how stable each plan is.
-9. **Seven-objective scoring including controller workload and airline fairness.** The AI won't recommend a plan that overloads humans.
-10. **Human-in-the-loop with a tamper-evident audit.** Supervisors approve, modify or reject every plan. Every recommendation, approval and override is hash-chained.
-11. **Bilingual voice Copilot (EN/ع).** Briefings and what-ifs, answered only from computed plan data (no hallucinated numbers).
-12. **Innovation Sandbox for GCAA.** It turns the digital twin into an experimentation platform with paired trials, confidence intervals, safety guardrails, sign-off gates (R2) and stage analytics (R4).
+6. **Taxiway network with conflict-free routing.** The manoeuvring area is a connected graph. Current practice uses fixed standard routes, and head-on, crossing and spacing conflicts are detected. FalconAero routes every movement with time-dependent Dijkstra plus a reservation table (cooperative path-finding): it may pick another connector or hold short for a few seconds, and the result is zero conflicts.
+7. **Wake-aware departure sequencing.** ICAO time-based wake separation behind Heavy and Super aircraft, with bounded position shifts.
+8. **Live disruption → instant re-plan.** Click a stand or runway to take it out of service. All plans are recomputed (~0.1–0.2 s) and the affected flights get new stands with ranked alternatives.
+9. **Regret-based stand allocation with towing.** Hard constraints cover ICAO Annex 14 code letters, outages and buffers. Soft costs cover remote/bussing, airline terminal, code waste, ambulance access and transfer walk.
+10. **Explainable by default.** Every decision shows its reasons, the alternatives rejected and what current practice would have done. The fog model shows each factor's contribution.
+11. **Stress-tested plans.** Monte-Carlo ETA-noise runs report how stable each plan is.
+12. **Seven-objective scoring including controller workload and airline fairness.** The AI won't recommend a plan that overloads humans.
+13. **Human-in-the-loop with a tamper-evident audit.** Supervisors approve, modify or reject every plan. Every recommendation, approval and override is hash-chained.
+14. **Bilingual voice Copilot (EN/ع).** Briefings and what-ifs, answered only from computed plan data (no hallucinated numbers).
+15. **Innovation Sandbox for GCAA.** It turns the digital twin into an experimentation platform with paired trials, confidence intervals, safety guardrails, sign-off gates (R2) and stage analytics (R4).
 
 ---
 
@@ -65,17 +68,20 @@ Benchmark: **32 disruption days** (4 scenarios × 8 seeds). The same traffic run
 
 | KPI (mean per disruption day) | Current practice | FalconAero | Change |
 |---|---:|---:|---:|
-| Average arrival delay incl. diversions | 11.8 min | 5.5 min | **−54%** |
-| Passenger-delay hours | 3,919 h | 1,709 h | **−56%** |
-| Airborne holding | 831 min | 308 min | **−63%** |
-| CO₂ from holding, queues and diversions | 210 t | 81 t | **−61%** |
+| Average arrival delay incl. diversions | 15.2 min | 8.6 min | **−43%** |
+| Passenger-delay hours | 5,080 h | 2,800 h | **−45%** |
+| Airborne holding | 831 min | 299 min | **−64%** |
+| CO₂ from holding, queues and diversions | 238 t | 101 t | **−57%** |
 | Diversions (all into fields also in fog) | 0.31 | 0 | **−100%** |
 | Aircraft reaching minimum fuel | 0.31 | 0 | **−100%** |
-| Stand / ground conflicts | 5.5 | 0 | **−100%** |
+| Stand conflicts | 4.8 | 0 | **−100%** |
+| **Taxi conflicts** (head-on / crossing / spacing) | 9.3 | 0 | **−100%** |
 | Emergency landing delay | 4.5 min | 0 min | **−100%** |
-| Plan computation | n/a | **~70 ms** | |
+| Runway throughput (arrivals landed by 08:00) | 73.5 | 78.5 | **+7%** |
+| Stand utilisation (avg) | 61% | 66% | **+5 pts** |
+| Re-planning time (all plans) | n/a | **~76 ms per plan** | |
 
-In the **Perfect Storm** demo day: average delay **26 → 8 min**, diversions **3 → 0**, conflicts **22 → 0**, MAYDAY lands with **0 min** delay.
+In the **Perfect Storm** demo day: average delay **30 → 12 min**, diversions **3 → 0**, conflicts **37 → 0**, MAYDAY lands with **0 min** delay.
 *All traffic is synthetic but calibrated to GCAA volumes; separation follows ICAO Doc 4444 minima. The Impact tab recomputes these numbers live in your browser.*
 
 ---

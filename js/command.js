@@ -144,7 +144,8 @@
     const taxi = ac.filter((a) => /taxi|queue|tow/.test(a.status)).length;
     const park = ac.filter((a) => a.status === 'parked').length;
     const blk = ac.filter((a) => a.status === 'waiting' && a.conflict).length;
-    $('#cmdLive').innerHTML = '<span>✈ ' + air + ' airborne</span><span class="' + (hold >= 4 ? 'warn' : '') + '">⟳ ' + hold + ' holding</span><span>⇢ ' + taxi + ' taxiing</span><span>🅿 ' + park + ' on stand</span>' + (blk ? '<span class="bad">⚠ ' + blk + ' blocked</span>' : '');
+    const hs = ac.filter((a) => a.status === 'hold-short').length;
+    $('#cmdLive').innerHTML = '<span>✈ ' + air + ' airborne</span><span class="' + (hold >= 4 ? 'warn' : '') + '">⟳ ' + hold + ' holding</span><span>⇢ ' + taxi + ' taxiing</span><span>🅿 ' + park + ' on stand</span>' + (hs ? '<span style="color:#7ff1ff">⏸ ' + hs + ' hold-short</span>' : '') + (blk ? '<span class="bad">⚠ ' + blk + ' blocked</span>' : '');
   }
 
   /* ---------- fog card ---------- */
@@ -192,6 +193,8 @@
       plan.alloc.filter((a) => a.remote).slice(0, 8).forEach((a) => add(a.onBlock, '🚌', a.id + ' → ' + a.stand, 'ai'));
       plan.seq.filter((s) => s.pos < s.fcfsPos - 1 && s.f.priority === 'normal').slice(0, 6).forEach((s) => add(s.land - 6, '⤴', s.id + ' moved up ' + (s.fcfsPos - s.pos), 'ai'));
     }
+    (S.replans || []).forEach((r) => add(r.t + 0.01, plan.cfg.mode === 'baseline' ? r.icon : '⚡', plan.cfg.mode === 'baseline' ? r.reason : 'Re-planned · ' + r.changes.length + ' changes · ' + Math.round(r.ms) + ' ms', plan.cfg.mode === 'baseline' ? 'bad' : 'ai'));
+    (plan.taxiConflicts || []).slice(0, 12).forEach((c) => add(c.t, '✖', c.a + '/' + c.b + ' ' + c.type, 'bad'));
     return ev.sort((a, b) => b.t - a.t);
   }
   function renderFeed(t) {
@@ -281,9 +284,57 @@
         else if (bs) { const bdl = Math.round(bs.land - f.eta + (ba ? ba.wait : 0)), ndl = Math.round(dl + (al ? al.wait : 0)); if (Math.abs(bdl - ndl) >= 3) why.push('vs today: ' + (bdl > 0 ? '+' : '') + bdl + '′' + (ba && ba.wait > 3 ? ' (blocked at stand)' : '')); }
       }
     }
+    card.className = 'cmd-card';
     card.hidden = false;
     card.innerHTML = '<div class="t"><span>' + f.id + ' <span class="dim" style="font-weight:600;font-size:12px">' + f.type + ' · ' + f.port + '</span></span><button id="cmdCardX">✕</button></div><div class="chips">' + chips.join('') + '</div><div class="why">' + U.esc(why[0] || '') + '</div>' + (why[1] ? '<div class="vs">' + U.esc(why[1]) + '</div>' : '');
     $('#cmdCardX').onclick = () => FA.app.select(null);
+  }
+
+  /* ---------- runway status & resource utilisation ---------- */
+  function renderRes(t) {
+    const S = FA.state, inst = S.inst, plan = shownPlan(), c = E.conditions(inst, t);
+    const win = (a, b) => a >= t - 30 && a < t + 30;
+    const mixed = c.rwyNClosed || (plan.mixedWins || []).some((w) => t >= w[0] && t < w[1]);
+    const nLand = plan.seq.filter((s) => s.rwy === 'N' && win(s.land)).length;
+    const sMov = plan.seq.filter((s) => s.rwy === 'S' && win(s.land)).length + plan.deps.filter((d) => win(d.ttot)).length;
+    const capN = c.rwyNClosed ? 0 : 60 / E.arrSep(inst, { wake: 'H' }, { wake: 'H' }, t, 0, false);
+    const capS = mixed ? (c.lvp ? 26 : 36) : 60 / E.depInterval(inst, t, plan.mixedWins); // mixed mode: arrivals + departures share the runway
+    let occ = 0, avail = 0;
+    plan.tl.forEach((ivs) => {
+      const cur = ivs.find((iv) => t >= iv.start && t < iv.end);
+      if (cur && cur.kind === 'outage') return;
+      avail++; if (cur) occ++;
+    });
+    const ac = FA.map.lastAircraft || [];
+    const moving = ac.filter((a) => /taxi|rollout|hold-short|queue|tow|waiting/.test(a.status)).length;
+    const capT = c.lvp ? 12 : 18;
+    const row = (n, mode, cls, u) => {
+      const pc = Math.round(Math.min(1.5, u) * 100), col = u >= 0.95 ? '#ef5350' : u >= 0.75 ? '#ffb300' : '#66bb6a';
+      return '<div class="cr"><span class="n">' + n + '</span><span class="m ' + cls + '">' + mode + '</span><span class="bar"><i style="width:' + Math.min(100, pc) + '%;background:' + col + '"></i></span><span class="p" style="color:' + col + '">' + (mode === 'CLOSED' ? '—' : pc + '%') + '</span></div>';
+    };
+    $('#cmdRes').innerHTML = '<div class="cmd-h"><span>RESOURCES</span><span class="dim" style="letter-spacing:0;font-weight:600">±30 min</span></div>' +
+      row('12L/30R', c.rwyNClosed ? 'CLOSED' : 'ARR', c.rwyNClosed ? 'closed' : '', capN ? nLand / capN : 0) +
+      row('12R/30L', mixed ? 'MIXED' : 'DEP', mixed ? 'mixed' : '', sMov / capS) +
+      row('STANDS', occ + '/' + avail, '', occ / Math.max(1, avail)) +
+      row('TAXIWAYS', moving + ' a/c', '', moving / capT);
+  }
+
+  /* ---------- re-plan card (alternatives after a live disruption) ---------- */
+  let rpTimer = null;
+  function replanCard(rp) {
+    const card = $('#cmdCard');
+    if (FA.state.view !== 'command') return;
+    clearTimeout(rpTimer);
+    let body;
+    if (rp.planId === 'baseline') {
+      body = rp.stranded > 0 ? '<div class="vs">Current practice: ' + rp.stranded + ' aircraft stranded → press ⚡ AI RECOVER</div>' : '<div class="why">No aircraft affected in the next hours.</div>';
+    } else if (!rp.changes.length) body = '<div class="why">Plan still optimal: no reassignments needed.</div>';
+    else body = '<div class="rows">' + rp.changes.slice(0, 5).map((c) => '<div><b>' + c.id + '</b><span>' + c.from + ' → ' + c.to + (c.alts.length ? ' <span class="alt">alt ' + c.alts.join(' · ') + '</span>' : '') + '</span></div>').join('') + '</div>' + (rp.changes.length > 5 ? '<div class="alt dim" style="margin-top:4px;font-size:11px">+' + (rp.changes.length - 5) + ' more</div>' : '');
+    card.className = 'cmd-card rp';
+    card.hidden = false;
+    card.innerHTML = '<div class="t"><span>' + rp.icon + ' ' + U.esc(rp.reason) + '</span><button id="cmdCardX">✕</button></div><div class="chips"><span>RE-PLANNED IN ' + Math.round(rp.ms) + ' ms</span><span>' + rp.changes.length + ' CHANGES</span></div>' + body;
+    $('#cmdCardX').onclick = () => { card.hidden = true; };
+    rpTimer = setTimeout(() => { if (card.classList.contains('rp')) card.hidden = true; }, 10000);
   }
 
   /* ---------- tick ---------- */
@@ -292,13 +343,14 @@
     renderLive();
     renderStatus(t);
     const m = Math.floor(t);
-    if (m !== lastMin) { lastMin = m; renderFeed(t); renderTl(t); }
+    if (m !== lastMin) { lastMin = m; renderFeed(t); renderTl(t); renderRes(t); }
     if (Math.abs(t - lastFog) >= 2) { lastFog = t; renderFog(t); }
   }
   function full() {
     const t = FA.state.t;
     lastMin = -1; lastFog = -99;
     renderScn(); renderGo(); renderKpis(false); renderNet(); renderCard();
+    renderRes(t);
     FA.map.render(t);
     onTick(t);
   }
@@ -339,6 +391,7 @@
         if (FA.state.view === 'command') { full(); renderKpis(true); }
       });
       FA.bus.on('select', renderCard);
+      FA.bus.on('replan', (rp) => { shown = new Set(); if (FA.state.view === 'command') { full(); renderKpis(true); replanCard(rp); } });
       FA.bus.on('view', (v) => { if (v !== 'command') hostMap(false); });
     },
     show() {

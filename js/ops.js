@@ -211,6 +211,7 @@
       initControls();
       const all = () => { renderScenarios(); renderKpis(); renderAI(); renderExplain(); renderTimeline(); };
       FA.bus.on('scenario', all);
+      FA.bus.on('replan', all);
       FA.bus.on('generated', () => { renderAI(); renderKpis(); renderExplain(); });
       FA.bus.on('approved', () => { renderAI(); renderKpis(); renderExplain(); renderTimeline(); });
       FA.bus.on('select', () => { renderExplain(); renderTimeline(); });

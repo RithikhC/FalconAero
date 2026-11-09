@@ -11,6 +11,7 @@ Open the site. It lands on the **Command** dashboard. Either press **▶ Guided 
 2. Press **⚡ AI RECOVER**, then **✔ APPROVE**. The KPIs flip green.
 3. Flip **BEFORE / AFTER** to show the difference on the map.
 4. Click an aircraft for its "why" card.
+5. **Live disruption:** click any stand (or runway 12L/30R) to take it out of service. FalconAero re-plans everything in ~0.2 s and pops up the reassignments with alternative stands.
 
 ## Script (≈ 3:00)
 
