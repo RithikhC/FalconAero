@@ -7,65 +7,70 @@
   <meta name="description" content="FalconAero: explainable AI decision support for air navigation service providers, airports and air traffic controllers during fog, sandstorms, runway closures and emergencies." />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="stylesheet" href="css/command.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
 </head>
 <body>
-  <header class="topbar hq">
-    <div class="brand">
-      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#26c6da"/><stop offset="1" stop-color="#e2b04a"/></linearGradient></defs><path d="M6 38 L30 30 L46 10 L52 12 L42 32 L58 30 L60 34 L40 40 L30 56 L24 55 L28 42 L8 44 Z" fill="url(#lg)"/></svg>
-      <div>
-        <div class="brand-name">FalconAero</div>
-        <div class="brand-sub">AI DISRUPTION RECOVERY · OMDB DUBAI</div>
-      </div>
+  <header class="hd">
+    <div class="hd-brand">
+      <svg class="hd-logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#1d4ed8"/><path d="M12 38 L31 32 L44 15 L49 16.5 L41 33 L54 31.5 L55.5 35 L39 39.5 L31 52 L26.5 51 L29.5 41 L13 42.5 Z" fill="#fff"/></svg>
+      <div class="hd-titles"><div class="hd-name">FalconAero</div><div class="hd-app">Airport Operations Control</div></div>
+      <span class="hd-loc">OMDB · Dubai International</span>
     </div>
-    <div class="cmd-scn" id="cmdScn"></div>
-    <div class="cmd-status" id="cmdStatus"></div>
-    <div class="top-right">
-      <span class="hq-live" id="hqLive"><i></i>LIVE DATA</span>
-      <div class="clock"><span class="clock-label">SIM TIME · GST</span><span id="clock">05:00</span></div>
-      <button class="btn gold" id="demoBtn">▶ DEMO</button>
+    <div class="hd-scn"><span class="hd-lbl">Scenario</span><div class="seg" id="cmdScn"></div></div>
+    <div class="hd-status" id="cmdStatus"></div>
+    <div class="hd-right">
+      <span class="hd-data" id="hqLive"></span>
+      <span class="hd-clock"><span id="clock">05:00</span><small>GST</small></span>
+      <span class="hd-user" title="Duty supervisor (demo)">DS</span>
+      <button class="d-btn ghost" id="demoBtn">Guided demo</button>
     </div>
     <nav id="tabs" hidden></nav><button id="langBtn" hidden></button>
   </header>
 
   <main id="views">
-    <!-- ================= SINGLE COMMAND DASHBOARD ================= -->
+    <!-- ================= OPERATIONS CONTROL DASHBOARD ================= -->
     <section class="view active" id="view-command">
-      <div class="cmd">
-        <div class="cmd-kpirow">
-          <div class="cmd-kpis" id="cmdKpis"></div>
-          <div class="cmd-action hud">
-            <button class="cmd-go" id="cmdGo">⚡ AI RECOVER</button>
-            <div class="cmd-cmp" id="cmdCmp" hidden><button data-m="baseline">BEFORE</button><button data-m="ai" class="on">AFTER</button></div>
+      <div class="db">
+        <div class="db-top">
+          <div class="db-kpis" id="cmdKpis"></div>
+          <div class="d-panel db-rec">
+            <div class="d-ph"><span>Disruption recovery</span><span class="d-meta" id="cmdRecMeta"></span></div>
+            <div class="d-pb db-rec-b">
+              <div class="rec-active" id="cmdRecActive" hidden></div>
+              <div class="rec-row">
+                <button class="d-btn primary" id="cmdGo">Generate recovery options</button>
+                <div class="seg sm" id="cmdCmp" hidden><button data-m="baseline">Baseline</button><button data-m="ai" class="on">Plan</button></div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="cmd-main3">
-          <div class="cmd-left">
-            <div class="panel hud cmd-fog" id="cmdFog"></div>
-            <div class="panel hud cmd-res" id="cmdRes"></div>
-            <div class="panel hud cmd-eval" id="cmdEval"></div>
-            <div class="panel hud cmd-net"><div class="cmd-h"><span>UAE NETWORK</span><span id="cmdNetChip"></span></div><div id="cmdNet"></div></div>
+        <div class="db-main">
+          <div class="db-col left">
+            <div class="d-panel" id="cmdFog"></div>
+            <div class="d-panel" id="cmdRes"></div>
+            <div class="d-panel db-eval" id="cmdEval"></div>
+            <div class="d-panel db-net"><div class="d-ph"><span>UAE network</span><span id="cmdNetChip"></span></div><div id="cmdNet" class="d-pb"></div></div>
           </div>
-          <div class="cmd-center panel hud">
-            <div class="cmd-map">
+          <div class="d-panel db-center">
+            <div class="d-ph"><span>Airfield · OMDB</span><span class="d-meta">Select a stand or runway to simulate an outage</span></div>
+            <div class="db-map">
               <div id="cmdMapSlot" class="cmd-slot"></div>
-              <div class="cmd-live" id="cmdLive"></div>
-              <div class="cmd-card" id="cmdCard" hidden></div>
-              <div class="cmd-overlay" id="cmdOverlay" hidden></div>
-              <div class="cmd-hint">click a stand or runway to disrupt it</div>
+              <div class="db-live" id="cmdLive"></div>
+              <div class="d-pop" id="cmdCard" hidden></div>
+              <div class="db-overlay" id="cmdOverlay" hidden></div>
             </div>
-            <div class="cmd-bottom">
-              <button class="btn icon" id="cmdPlay">▶</button>
-              <div class="speed" id="cmdSpeed"><button data-s="60">1×</button><button data-s="120" class="on">2×</button><button data-s="300">5×</button></div>
+            <div class="db-bottom">
+              <button class="d-btn icon" id="cmdPlay" aria-label="Play / pause"></button>
+              <div class="seg sm" id="cmdSpeed"><button data-s="60">1×</button><button data-s="120" class="on">2×</button><button data-s="300">5×</button></div>
               <div class="cmd-tl" id="cmdTl"></div>
-              <span class="cmd-clock mono" id="cmdClock">05:00</span>
+              <span class="db-clock" id="cmdClock">05:00</span>
             </div>
           </div>
-          <div class="cmd-right">
-            <div class="panel hud cmd-feed"><div class="cmd-h"><span id="cmdFeedTitle">LIVE EVENTS</span><span class="cmd-dot"></span></div><div id="cmdFeed" class="cmd-feed-list"></div></div>
-            <div class="panel hud cmd-seq"><div class="cmd-h"><span>ARRIVAL SEQUENCE</span><span id="cmdSeqChip" class="dim"></span></div><div id="cmdSeq"></div></div>
+          <div class="db-col right">
+            <div class="d-panel db-feed"><div class="d-ph"><span>Event log</span><span class="d-meta" id="cmdFeedMeta"></span></div><div id="cmdFeed" class="d-pb feed"></div></div>
+            <div class="d-panel db-seq"><div class="d-ph"><span>Arrival sequence</span><span class="d-meta" id="cmdSeqChip"></span></div><div id="cmdSeq" class="d-pb seqw"></div></div>
           </div>
         </div>
       </div>

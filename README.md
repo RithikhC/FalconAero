@@ -29,18 +29,18 @@ The pain is real and recent. Fog forced **19 inbound diversions at DXB on 20 Nov
 
 ## 2. One screen: the FalconAero command dashboard
 
-Everything lives on a single control-room dashboard. There are no tabs and no pages to explain.
+Everything lives on a single operations-control dashboard, styled like production ops software: flat panels, standard terminology, colour used only for status.
 
 | Area | What it shows |
 |---|---|
 | **Header** | Scenario selector (Normal · Fog · Sandstorm · Runway closed · Perfect Storm), live status pills (LVP / closures / blocked aircraft / AI plan active), live-data indicator, sim clock, **▶ DEMO** |
-| **KPI strip** | Avg delay · diversions · conflicts · min fuel margin · CO₂ · missed connections, plus the **⚡ AI RECOVER → plan cards → ✔ APPROVE** control and a **BEFORE ⟷ AFTER** toggle |
+| **KPI strip** | Avg delay · diversions · conflicts · min fuel margin · CO₂ · missed connections, plus the **Disruption recovery** control (**Generate recovery options → Approve**) and a **Baseline / Plan** toggle |
 | **Airport twin (center)** | Runways, taxiway network, 70 stands, animated aircraft (holding, final, taxi, hold-short, towing), fog layer, live counters, timeline. **Click a stand or runway** to take it out of service: every plan is recomputed instantly and the reassignments and alternatives pop up. Click any aircraft for its "why" card |
-| **AI fog radar** | Fog probability for the next 60 min (model trained on 11 years of real OMDB METARs), RVR, trend, live OMDB weather |
+| **Visibility forecast** | Fog probability for the next 60 min (model trained on 11 years of real OMDB METARs), RVR, trend, live OMDB weather |
 | **Resources** | Runway status and mode (ARR / DEP / MIXED / CLOSED), runway, stand and taxiway utilisation |
-| **Evaluation** | Today's practice vs FalconAero for the current scenario: delay, conflicts, taxi conflicts, diversions, CO₂, throughput |
+| **Baseline vs plan** | Today's practice vs FalconAero for the current scenario: delay, conflicts, taxi conflicts, diversions, CO₂, throughput |
 | **UAE network** | 7 UAE airports, weather state, diversion arcs, live aircraft positions over the UAE |
-| **Live AI actions** | Streaming feed: incidents (today) or AI actions (towing, mixed-mode runway, early diversions, re-plans) |
+| **Event log** | Time-stamped, category-coded log (WX, RWY, STAND, TAXI, DIV, ATFM, SEQ, EMER, PLAN) of incidents and recovery actions |
 | **Arrival sequence** | Next arrivals with sequence position, ETA vs landing (predicted delay), runway, stand and live status |
 
 *(The engine also ships deeper analysis modules in `js/`: plan comparison, network, data, innovation sandbox, governance and impact. They are not shown in the dashboard UI.)*

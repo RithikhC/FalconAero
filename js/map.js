@@ -23,8 +23,8 @@
     svg.innerHTML = '';
     const defs = el('defs', {}, svg);
     defs.innerHTML =
-      '<linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1626"/><stop offset="1" stop-color="#08111d"/></linearGradient>' +
-      '<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#0f1d33" stroke-width="1"/></pattern>' +
+      '<linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1218"/><stop offset="1" stop-color="#0d1218"/></linearGradient>' +
+      '<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#0d1218" stroke-width="1"/></pattern>' +
       '<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#3a1418"/><line x1="0" y1="0" x2="0" y2="6" stroke="#ef5350" stroke-width="2"/></pattern>' +
       '<filter id="blur12"><feGaussianBlur stdDeviation="14"/></filter>' +
       '<filter id="glow"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
@@ -34,13 +34,13 @@
     gStatic = el('g', {}, svg);
 
     // apron surface
-    el('rect', { x: 190, y: 190, width: 905, height: 355, rx: 14, fill: '#0d1a2c', stroke: '#152741' }, gStatic);
+    el('rect', { x: 190, y: 190, width: 905, height: 355, rx: 6, fill: '#121820', stroke: '#1a222c' }, gStatic);
 
     // taxiways
     const twy = (pts, w) => {
       const d = 'M' + pts.map((p) => p.join(',')).join(' L');
-      el('path', { d, stroke: '#1a2a44', 'stroke-width': w || 11, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, gStatic);
-      el('path', { d, stroke: '#c9a227', 'stroke-width': 1, fill: 'none', opacity: 0.45, 'stroke-dasharray': '6 5' }, gStatic);
+      el('path', { d, stroke: '#1d252f', 'stroke-width': w || 11, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, gStatic);
+      el('path', { d, stroke: '#a88a2a', 'stroke-width': 1, fill: 'none', opacity: 0.35 }, gStatic);
     };
     twy([[G.rwyN.x1, G.twyN], [G.rwyN.x2, G.twyN]]);
     twy([[G.holdS.x, G.twyS], [G.rwyS.x2, G.twyS]]);
@@ -51,18 +51,18 @@
 
     // runways
     const rwy = (r, label, role) => {
-      el('rect', { x: r.x1, y: r.y - 11, width: r.x2 - r.x1, height: 22, rx: 3, fill: '#1c2433', stroke: '#33435e' }, gStatic);
+      el('rect', { x: r.x1, y: r.y - 11, width: r.x2 - r.x1, height: 22, rx: 3, fill: '#2a3038', stroke: '#3a414b' }, gStatic);
       el('line', { x1: r.x1 + 70, x2: r.x2 - 70, y1: r.y, y2: r.y, stroke: '#e8eef8', 'stroke-width': 1.4, 'stroke-dasharray': '16 12', opacity: 0.7 }, gStatic);
       for (let i = 0; i < 6; i++) {
         el('rect', { x: r.x1 + 8, y: r.y - 9 + i * 3.3, width: 16, height: 1.8, fill: '#e8eef8', opacity: 0.8 }, gStatic);
         el('rect', { x: r.x2 - 24, y: r.y - 9 + i * 3.3, width: 16, height: 1.8, fill: '#e8eef8', opacity: 0.8 }, gStatic);
       }
       // approach lights
-      for (let i = 1; i <= 6; i++) el('circle', { cx: r.x1 - i * 14, cy: r.y, r: 1.8, fill: '#ffe082', opacity: 0.9 - i * 0.12, class: 'pulse' }, gStatic);
+      for (let i = 1; i <= 6; i++) el('circle', { cx: r.x1 - i * 14, cy: r.y, r: 1.4, fill: '#d9c27a', opacity: 0.75 - i * 0.1 }, gStatic);
       const [a, b] = label.split('/');
       el('text', { x: r.x1 + 34, y: r.y + 4, class: 'rwy-lbl', 'text-anchor': 'start' }, gStatic).textContent = a;
       el('text', { x: r.x2 - 34, y: r.y + 4, class: 'rwy-lbl', 'text-anchor': 'end' }, gStatic).textContent = b;
-      el('text', { x: (r.x1 + r.x2) / 2, y: r.y + (r === G.rwyN ? -18 : 28), fill: '#5f7598', 'font-size': 11, 'font-weight': 700, 'text-anchor': 'middle', 'letter-spacing': '.12em' }, gStatic).textContent = 'RWY ' + label + ' · ' + role;
+      el('text', { x: (r.x1 + r.x2) / 2, y: r.y + (r === G.rwyN ? -18 : 28), fill: '#5d6877', 'font-size': 10, 'font-weight': 600, 'text-anchor': 'middle', 'letter-spacing': '.08em', 'font-family': 'Inter, sans-serif' }, gStatic).textContent = 'RWY ' + label + ' · ' + role;
     };
     rwy(G.rwyN, '12L/30R', 'PRIMARY ARRIVALS');
     rwy(G.rwyS, '12R/30L', 'PRIMARY DEPARTURES');
@@ -72,14 +72,14 @@
 
     // holding stacks
     G.holdStacks.forEach((s) => {
-      el('circle', { cx: s.x, cy: s.y, r: 26, fill: 'none', stroke: '#ffb300', 'stroke-opacity': 0.35, 'stroke-dasharray': '4 4' }, gStatic);
-      el('text', { x: s.x, y: s.y + 40, fill: '#9c7a2a', 'font-size': 9, 'text-anchor': 'middle', 'font-weight': 700 }, gStatic).textContent = s.name;
+      el('circle', { cx: s.x, cy: s.y, r: 26, fill: 'none', stroke: '#4b5563', 'stroke-opacity': 0.8, 'stroke-dasharray': '3 4' }, gStatic);
+      el('text', { x: s.x, y: s.y + 40, fill: '#6c7787', 'font-size': 8.5, 'text-anchor': 'middle', 'font-weight': 600, 'font-family': 'Inter, sans-serif' }, gStatic).textContent = s.name.replace('Stack', 'HOLD');
     });
     el('text', { x: G.holdS.x - 6, y: G.holdS.y - 12, fill: '#5f7598', 'font-size': 9, 'text-anchor': 'end' }, gStatic).textContent = 'HOLD';
 
     // piers
     D.PIERS.forEach((p) => {
-      if (p.id !== 'R') el('rect', { x: p.x1, y: p.y - 14, width: p.x2 - p.x1, height: 28, rx: 6, fill: p.contact ? '#1a2d4b' : 'none', stroke: '#36507a' }, gStatic);
+      if (p.id !== 'R') el('rect', { x: p.x1, y: p.y - 14, width: p.x2 - p.x1, height: 28, rx: 3, fill: p.contact ? '#1e2631' : 'none', stroke: '#323d4b' }, gStatic);
       el('text', { x: (p.x1 + p.x2) / 2, y: p.y + 4, class: 'pier-lbl', 'text-anchor': 'middle' }, gStatic).textContent = p.label;
     });
 
@@ -91,9 +91,9 @@
       const g = el('g', { 'data-stand': s.id, style: 'cursor:pointer' }, gStands);
       g.addEventListener('click', (e) => { e.stopPropagation(); FA.app.toggleStand(s.id); });
       el('title', {}, g).textContent = 'Stand ' + s.id + ' (Code ' + s.code + ') · click to mark unavailable';
-      if (s.contact) el('line', { x1: s.x, y1: s.side === 'top' ? s.y + 9 : s.y - 9, x2: s.x, y2: s.side === 'top' ? s.y + 24 : s.y - 24, stroke: '#2b4166', 'stroke-width': 3 }, g);
+      if (s.contact) el('line', { x1: s.x, y1: s.side === 'top' ? s.y + 9 : s.y - 9, x2: s.x, y2: s.side === 'top' ? s.y + 24 : s.y - 24, stroke: '#323d4b', 'stroke-width': 2.5 }, g);
       const w = s.code === 'F' ? 30 : s.code === 'E' ? 26 : 20;
-      const r = el('rect', { x: s.x - w / 2, y: s.y - 10, width: w, height: 20, rx: 3, class: 'stand-rect', fill: '#0f1b2f' }, g);
+      const r = el('rect', { x: s.x - w / 2, y: s.y - 10, width: w, height: 20, rx: 2, class: 'stand-rect', fill: '#151c25' }, g);
       el('text', { x: s.x, y: s.side === 'top' ? s.y - 13 : s.y + 19, class: 'stand-lbl', 'text-anchor': 'middle' }, g).textContent = s.id + (s.code === 'F' ? '·F' : '');
       standEls.set(s.id, r);
     });
@@ -101,27 +101,27 @@
     // weather & event layers
     gFx = el('g', { 'pointer-events': 'none' }, svg);
     fogLayer = el('g', { opacity: 0 }, gFx);
-    el('rect', { x: 0, y: 0, width: G.W, height: G.H, fill: '#cfd8e3', opacity: 0.2 }, fogLayer);
-    for (let i = 0; i < 9; i++) {
+    el('rect', { x: 0, y: 0, width: G.W, height: G.H, fill: '#9aa6b4', opacity: 0.16 }, fogLayer);
+    for (let i = 0; i < 0; i++) {
       el('ellipse', { cx: 80 + i * 135, cy: 120 + (i % 3) * 220, rx: 190, ry: 90, fill: 'url(#fogR)', opacity: 0.38, class: 'fogcloud', style: 'animation-delay:-' + i * 2 + 's' }, fogLayer);
     }
     sandLayer = el('g', { opacity: 0 }, gFx);
-    el('rect', { x: 0, y: 0, width: G.W, height: G.H, fill: '#c98a3a', opacity: 0.28 }, sandLayer);
+    el('rect', { x: 0, y: 0, width: G.W, height: G.H, fill: '#a6773a', opacity: 0.16 }, sandLayer);
     closureLayer = el('g', { opacity: 0 }, gFx);
     for (let x = G.rwyN.x1 + 120; x < G.rwyN.x2 - 60; x += 160) {
       el('path', { d: 'M' + (x - 12) + ' ' + (G.rwyN.y - 10) + ' L' + (x + 12) + ' ' + (G.rwyN.y + 10) + ' M' + (x + 12) + ' ' + (G.rwyN.y - 10) + ' L' + (x - 12) + ' ' + (G.rwyN.y + 10), stroke: '#ef5350', 'stroke-width': 4 }, closureLayer);
     }
     mixedLayer = el('g', { opacity: 0 }, gFx);
-    el('rect', { x: G.rwyS.x1, y: G.rwyS.y - 13, width: G.rwyS.x2 - G.rwyS.x1, height: 26, rx: 4, fill: 'none', stroke: '#26c6da', 'stroke-width': 2, 'stroke-dasharray': '8 5', filter: 'url(#glow)' }, mixedLayer);
-    el('text', { x: G.rwyS.x2 - 10, y: G.rwyS.y - 18, fill: '#7ff1ff', 'font-size': 10, 'font-weight': 800, 'text-anchor': 'end' }, mixedLayer).textContent = 'MIXED MODE — ARRIVALS + DEPARTURES';
+    el('rect', { x: G.rwyS.x1, y: G.rwyS.y - 13, width: G.rwyS.x2 - G.rwyS.x1, height: 26, rx: 4, fill: 'none', stroke: '#5b8def', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }, mixedLayer);
+    el('text', { x: G.rwyS.x2 - 10, y: G.rwyS.y - 18, fill: '#a9c3f6', 'font-size': 9.5, 'font-weight': 600, 'text-anchor': 'end', 'font-family': 'Inter, sans-serif' }, mixedLayer).textContent = 'MIXED MODE · ARRIVALS AND DEPARTURES';
 
     gRoute = el('g', {}, svg);
     gAc = el('g', {}, svg);
     // compass
     const cg = el('g', { transform: 'translate(1160,668)' }, svg);
-    el('path', { d: 'M0 -14 L5 4 L0 0 L-5 4 Z', fill: '#8ea3c4' }, cg);
+    el('path', { d: 'M0 -14 L5 4 L0 0 L-5 4 Z', fill: '#6c7787' }, cg);
     el('text', { x: 0, y: -18, fill: '#8ea3c4', 'font-size': 9, 'text-anchor': 'middle' }, cg).textContent = 'N';
-    el('text', { x: 14, y: 692, fill: '#3f5577', 'font-size': 10 }, svg).textContent = 'OMDB · Dubai International — stylised digital twin (not to scale) · synthetic traffic';
+    el('text', { x: 14, y: 692, fill: '#465161', 'font-size': 9.5, 'font-family': 'Inter, sans-serif' }, svg).textContent = 'OMDB Dubai International · schematic, not to scale · simulated traffic';
     pool.clear(); poolPlan = null;
   }
 
@@ -234,9 +234,9 @@
 
   /* ---------------- render ---------------- */
   function acColor(f) {
-    if (f.airline === 'EK') return '#e2b04a';
-    if (f.airline === 'FZ') return '#4fc3f7';
-    return '#b0bec5';
+    if (f.airline === 'EK') return '#d1a640';
+    if (f.airline === 'FZ') return '#5b9be8';
+    return '#aab3be';
   }
 
   function ensure(id, f) {
@@ -280,8 +280,8 @@
       const r = standEls.get(id); if (!r) return;
       const cur = ivs.find((iv) => t >= iv.start && t < iv.end);
       const out = cur && cur.kind === 'outage';
-      r.setAttribute('fill', out ? 'url(#hatch)' : cur ? (cur.kind === 'arr' ? '#1f4a6e' : '#283a5c') : '#0f1b2f');
-      r.setAttribute('stroke', waitingFor.has(id) ? '#ef5350' : out ? '#ef5350' : '#36507a');
+      r.setAttribute('fill', out ? 'url(#hatch)' : cur ? (cur.kind === 'arr' ? '#22364f' : '#262f3c') : '#151c25');
+      r.setAttribute('stroke', waitingFor.has(id) ? '#e5484d' : out ? '#a8383c' : '#323d4b');
       r.setAttribute('stroke-width', waitingFor.has(id) ? 2.5 : 1);
     });
 
@@ -298,13 +298,13 @@
       body.setAttribute('transform', 'rotate(' + (a.a * 180 / Math.PI).toFixed(1) + ') scale(' + sc2 + ')');
       const halo = g.querySelector('.halo');
       let ring = 'transparent', dash = '';
-      if (a.f.priority === 'mayday' || a.f.priority === 'medical') ring = '#ef5350';
-      else if (a.status === 'diverting') ring = '#b388ff';
-      else if (a.status === 'waiting' && a.conflict) ring = '#ef5350';
-      else if (a.status === 'holding') ring = a.lowFuel ? '#ef5350' : '#ffb300';
-      else if (a.status === 'tow') { ring = '#ffee58'; dash = '3 2'; }
-      else if (a.status === 'hold-short') { ring = '#26c6da'; dash = '2 2'; }
-      else if (a.f.priority === 'state') ring = '#e2b04a';
+      if (a.f.priority === 'mayday' || a.f.priority === 'medical') ring = '#e5484d';
+      else if (a.status === 'diverting') ring = '#9b7be0';
+      else if (a.status === 'waiting' && a.conflict) ring = '#e5484d';
+      else if (a.status === 'holding') ring = a.lowFuel ? '#e5484d' : '#d4a017';
+      else if (a.status === 'tow') { ring = '#c9b458'; dash = '3 2'; }
+      else if (a.status === 'hold-short') { ring = '#5b8def'; dash = '2 2'; }
+      else if (a.f.priority === 'state') ring = '#d1a640';
       if (S.selected === a.id) ring = '#ffffff';
       halo.setAttribute('stroke', ring);
       halo.setAttribute('stroke-dasharray', dash);
@@ -312,7 +312,7 @@
       const tx = g.querySelector('text');
       const moving = a.status !== 'parked';
       tx.style.display = (showLbl && (moving || S.selected === a.id)) ? '' : 'none';
-      tx.textContent = a.f.id + (a.status === 'diverting' ? ' → ' + a.alt : a.status === 'holding' ? ' ⟳' : a.status === 'tow' ? ' 🚜' : a.status === 'hold-short' ? ' ⏸' : '');
+      tx.textContent = a.f.id + (a.status === 'diverting' ? ' → ' + a.alt : a.status === 'holding' ? ' HLD' : a.status === 'tow' ? ' TOW' : a.status === 'hold-short' ? ' HS' : '');
     });
     pool.forEach((g, id) => { if (!seen.has(id)) g.style.display = 'none'; });
 
@@ -326,22 +326,22 @@
       let route = (a && a.route) || (smv && smv.pts);
       if (!route && al && sq) route = E.routeIn(E.standById(S.inst, al.stand), sq.rwy);
       if (route) el('path', { d: 'M' + route.map((p) => p.join(',')).join(' L'), class: 'route' }, gRoute);
-      if (al) { const s = E.standById(S.inst, al.stand); el('rect', { x: s.x - 18, y: s.y - 14, width: 36, height: 28, rx: 5, fill: 'none', stroke: '#00e5ff', 'stroke-width': 2, class: 'pulse' }, gRoute); }
+      if (al) { const s = E.standById(S.inst, al.stand); el('rect', { x: s.x - 18, y: s.y - 14, width: 36, height: 28, rx: 3, fill: 'none', stroke: '#3b82f6', 'stroke-width': 1.5 }, gRoute); }
     }
 
     // ground-movement conflicts (current practice) flash where and when they happen
     (plan.taxiConflicts || []).filter((c) => Math.abs(c.t - t) < 1.2).forEach((c) => {
-      el('circle', { cx: c.x, cy: c.y, r: 13, fill: 'rgba(239,83,80,.25)', stroke: '#ef5350', 'stroke-width': 2, class: 'pulse' }, gRoute);
+      el('circle', { cx: c.x, cy: c.y, r: 11, fill: 'rgba(229,72,77,.18)', stroke: '#e5484d', 'stroke-width': 1.5 }, gRoute);
       el('text', { x: c.x, y: c.y + 4, fill: '#fff', 'font-size': 11, 'font-weight': 800, 'text-anchor': 'middle' }, gRoute).textContent = '!';
     });
     // banner
     const b = [];
-    if (c.lvp) b.push('<span class="b lvp">LVP ACTIVE · CAT III · RVR ' + c.rvr + ' m</span>');
+    if (c.lvp) b.push('<span class="b lvp">LVP · CAT III · RVR ' + c.rvr + ' M</span>');
     if (c.degraded) b.push('<span class="b lvp">DUST / X-WIND · VIS ' + c.vis + ' m</span>');
     if (c.rwyNClosed) b.push('<span class="b red">RWY 12L/30R CLOSED</span>');
-    else if (mixed) b.push('<span class="b cy">AI: 12R/30L MIXED MODE</span>');
+    else if (mixed) b.push('<span class="b cy">12R/30L MIXED MODE</span>');
     const waiting = acs.filter((a) => a.status === 'waiting' && a.conflict).length;
-    if (waiting) b.push('<span class="b red">' + waiting + ' AIRCRAFT BLOCKED — STAND CONFLICT</span>');
+    if (waiting) b.push('<span class="b red">' + waiting + ' AWAITING STAND</span>');
     const tc = (plan.taxiConflicts || []).filter((c) => Math.abs(c.t - t) < 1.2).length;
     if (tc) b.push('<span class="b red">' + tc + ' TAXI CONFLICT' + (tc > 1 ? 'S' : '') + '</span>');
     const holding = acs.filter((a) => a.status === 'holding').length;
